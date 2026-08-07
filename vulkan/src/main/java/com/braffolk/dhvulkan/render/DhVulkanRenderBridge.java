@@ -40,6 +40,11 @@ public final class DhVulkanRenderBridge {
             return;
         }
 
+        net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim = Minecraft.getInstance().level.dimension();
+        if (dim == net.minecraft.world.level.Level.NETHER || dim == net.minecraft.world.level.Level.END) {
+            return;
+        }
+
         DhRenderState state = ClientApi.RENDER_STATE;
         state.clientLevelWrapper = ClientLevelWrapper.getWrapperIfDifferent(
                 state.clientLevelWrapper,
