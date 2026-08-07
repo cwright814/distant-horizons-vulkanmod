@@ -4,7 +4,7 @@ A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizon
 
 LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling Distant Horizons to work on systems and configurations running VulkanMod.
 
-> **This is not a standalone mod.** You must have both Distant Horizons and VulkanMod installed. Versions v2.4.6+vm.3 and earlier were standalone forks of DH; Newer versions are a separate extension mod that runs alongside unmodified DH. Tested for Minecraft versions 1.20.6 and 26.1–26.1.2.
+> **This is not a standalone mod.** You must have Distant Horizons, VulkanMod, AND Beryl installed. Get the latest versions as of Aug 6th, 2026. Tested for Minecraft version 26.1.2 with the default texture pack. I recommend installing "Not Enough Vulkan" and disabling atmospheric fog - you still get fog, but it allows the blend between the real chunks and lod chunks to be more seamless.
 
 ![Distant Horizons running on VulkanMod](docs/dh-vulkanmod.jpg)
 *Distant Horizons LODs rendered via VulkanMod's Vulkan backend*
