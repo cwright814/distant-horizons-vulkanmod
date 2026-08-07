@@ -40,7 +40,7 @@ public class DhVulkanModMenuApi implements ModMenuApi {
         // Sunrise (22000 to 24000)
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            float defaultVal = (i == 0) ? 0.0f : ((i == 1) ? 0.5f : ((i == 2) ? 0.75f : ((i == 3) ? 0.9f : 1.0f)));
+            float defaultVal = (i == 0) ? 0.0f : ((i == 1) ? 0.55f : ((i == 2) ? 0.85f : ((i == 3) ? 0.96f : 1.0f)));
             sunriseCategory.addEntry(entryBuilder.startFloatField(Component.literal("Sunrise Step " + (i + 1)), cfg.sunriseCurve[i])
                     .setDefaultValue(defaultVal)
                     .setMin(0.0f)
@@ -52,7 +52,7 @@ public class DhVulkanModMenuApi implements ModMenuApi {
         // Sunset (12000 to 14000)
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            float defaultVal = (i == 0) ? 1.0f : ((i == 1) ? 0.9f : ((i == 2) ? 0.75f : ((i == 3) ? 0.5f : 0.0f)));
+            float defaultVal = (i == 0) ? 1.0f : ((i == 1) ? 0.96f : ((i == 2) ? 0.85f : ((i == 3) ? 0.55f : 0.0f)));
             sunsetCategory.addEntry(entryBuilder.startFloatField(Component.literal("Sunset Step " + (i + 1)), cfg.sunsetCurve[i])
                     .setDefaultValue(defaultVal)
                     .setMin(0.0f)
@@ -63,7 +63,7 @@ public class DhVulkanModMenuApi implements ModMenuApi {
 
         ConfigCategory fresnelCategory = builder.getOrCreateCategory(Component.literal("Fresnel Height"));
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Base Y Level"), cfg.fresnelHeightBaseY)
-                .setDefaultValue(80.0f)
+                .setDefaultValue(85.0f)
                 .setSaveConsumer(newValue -> cfg.fresnelHeightBaseY = newValue)
                 .build());
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Y Level"), cfg.fresnelHeightTargetY)
@@ -71,11 +71,11 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                 .setSaveConsumer(newValue -> cfg.fresnelHeightTargetY = newValue)
                 .build());
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Multiplier"), cfg.fresnelHeightTargetMult)
-                .setDefaultValue(0.45f)
+                .setDefaultValue(0.1f)
                 .setSaveConsumer(newValue -> cfg.fresnelHeightTargetMult = newValue)
                 .build());
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Min Multiplier"), cfg.fresnelHeightMinMult)
-                .setDefaultValue(0.25f)
+                .setDefaultValue(-0.125f)
                 .setSaveConsumer(newValue -> cfg.fresnelHeightMinMult = newValue)
                 .build());
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Max Multiplier"), cfg.fresnelHeightMaxMult)

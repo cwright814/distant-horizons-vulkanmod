@@ -47,18 +47,18 @@ public class DhVulkanConfig {
     /**
      * Sunrise transition curve (ticks 22000 to 24000)
      */
-    public float[] sunriseCurve = new float[]{0.0f, 0.5f, 0.75f, 0.9f, 1.0f};
+    public float[] sunriseCurve = new float[]{0.0f, 0.55f, 0.85f, 0.96f, 1.0f};
 
     /**
      * Sunset transition curve (ticks 12000 to 14000)
      */
-    public float[] sunsetCurve = new float[]{1.0f, 0.9f, 0.75f, 0.5f, 0.0f};
+    public float[] sunsetCurve = new float[]{1.0f, 0.96f, 0.85f, 0.55f, 0.0f};
 
     /** Fresnel height scaling values */
-    public float fresnelHeightBaseY = 80.0f;
+    public float fresnelHeightBaseY = 85.0f;
     public float fresnelHeightTargetY = 125.0f;
-    public float fresnelHeightTargetMult = 0.45f;
-    public float fresnelHeightMinMult = 0.25f;
+    public float fresnelHeightTargetMult = 0.1f;
+    public float fresnelHeightMinMult = -0.125f;
     public float fresnelHeightMaxMult = 2.0f;
 
     // ---- Load / Save ----
