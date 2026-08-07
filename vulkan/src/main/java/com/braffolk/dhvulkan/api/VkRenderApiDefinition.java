@@ -7,7 +7,9 @@ import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup
 import com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.LodBufferContainer;
 import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
-import com.seibel.distanthorizons.core.util.math.Vec3f;
+import com.seibel.distanthorizons.core.util.math.DhMat4f;
+import com.seibel.distanthorizons.core.util.math.DhVec3f;
+import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
 import com.seibel.distanthorizons.core.util.objects.SortedArraySet;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
@@ -53,7 +55,10 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
         // Init is deferred to the first runRenderPassSetup() call.
     }
 
-    @Override public String getApiName() { return "VulkanMod"; }
+    @Override public String getEngineName() { return "VulkanMod"; }
+    @Override public boolean isNativeRenderer() { return true; }
+    @Override public com.seibel.distanthorizons.core.render.EDhRenderDepth getRenderDepth() { return com.seibel.distanthorizons.core.render.EDhRenderDepth.FORWARD_Z; }
+    @Override public com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi getRenderApi() { return com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi.VULKAN; }
 
     @Override
     public boolean useSingleIbo() {
@@ -83,11 +88,13 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
     // =========================================== //
 
     static RenderUniforms toUniforms(RenderParams params, RenderUniforms target) {
-        target.set((com.seibel.distanthorizons.core.util.math.Mat4f) (Object) params.dhProjectionMatrix,
-              (com.seibel.distanthorizons.core.util.math.Mat4f) (Object) params.dhModelViewMatrix,
-              (com.seibel.distanthorizons.core.util.math.Mat4f) (Object) params.mcProjectionMatrix);
-        target.worldYOffset = params.worldYOffset;
-        target.partialTicks = params.partialTicks;
+        if (params != null) {
+            target.set(params.dhProjectionMatrix,
+                       params.dhModelViewMatrix,
+                       params.mcProjectionMatrix);
+            target.worldYOffset = params.worldYOffset;
+            target.partialTicks = params.partialTicks;
+        }
         return target;
     }
 
@@ -172,7 +179,7 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
         private final VulkanBackend backend;
 
         // Cached to avoid per-container allocation in the render loop
-        private final Vec3f reusableModelPos = new Vec3f(0, 0, 0);
+        private final DhVec3f reusableModelPos = new DhVec3f(0, 0, 0);
 
         // Cached reflection fields for VBO arrays in LodBufferContainer.
         // DH 3.0: vboOpaqueWrappers / vboTransparentWrappers
@@ -229,7 +236,7 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
                 LodBufferContainer container = bufferContainers.get(lodIndex);
 
                 // Compute model offset relative to camera (matches GL reference)
-                com.seibel.distanthorizons.core.util.math.Vec3d camPos = renderEventParam.exactCameraPosition;
+                DhVec3d camPos = renderEventParam.exactCameraPosition;
                 if (camPos != null) {
                     this.reusableModelPos.set(
                         (float) (container.minCornerBlockPos.getX() - camPos.x),
@@ -268,7 +275,7 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
     }
 
     static class VkFogRenderer implements IDhFogRenderer {
-        @Override public void render(RenderParams renderParams) { /* handled internally by VulkanBackend */ }
+        @Override public void render(RenderParams renderParams, com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiFogRenderParam fogParam) { /* handled internally by VulkanBackend */ }
     }
 
     static class VkFarFadeRenderer implements IDhFarFadeRenderer {

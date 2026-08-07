@@ -19,6 +19,9 @@
     "entrypoints": {
         "client": [
             "com.braffolk.dhvulkan.DhVulkanModEntrypoint"
+        ],
+        "modmenu": [
+            "com.braffolk.dhvulkan.config.DhVulkanModMenuApi"
         ]
     },
     "mixins": [

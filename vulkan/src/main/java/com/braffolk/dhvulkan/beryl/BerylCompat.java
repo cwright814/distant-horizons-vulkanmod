@@ -95,9 +95,9 @@ public final class BerylCompat {
         // Check DH's rendering API config
         try {
             Object apiEnum = com.seibel.distanthorizons.core.config.Config
-                    .Client.Advanced.Graphics.Experimental.renderingApi.get();
+                    .Client.Advanced.Graphics.Experimental.renderingEngine.get();
             String apiName = apiEnum.toString();
-            return "AUTO".equals(apiName);
+            return !"OPEN_GL".equals(apiName);
         } catch (Exception e) {
             // Config access failed; default to Vulkan when VulkanMod is present
             return true;

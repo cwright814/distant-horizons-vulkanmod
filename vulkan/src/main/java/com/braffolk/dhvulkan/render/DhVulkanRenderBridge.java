@@ -36,6 +36,10 @@ public final class DhVulkanRenderBridge {
             return;
         }
 
+        if (Minecraft.getInstance().level == null) {
+            return;
+        }
+
         DhRenderState state = ClientApi.RENDER_STATE;
         state.clientLevelWrapper = ClientLevelWrapper.getWrapperIfDifferent(
                 state.clientLevelWrapper,
@@ -69,22 +73,16 @@ public final class DhVulkanRenderBridge {
      * Under VulkanMod those injects may not run before terrain; fall back to VRenderSystem.
      */
     private static void ensureRenderMatrices(DhRenderState state, Matrix4fc levelModelView) {
-        if (state.mcProjectionMatrix == null) {
-            state.mcProjectionMatrix = McObjectConverter.Convert(VRenderSystem.projection);
-            if (!loggedMatrixFallback) {
-                loggedMatrixFallback = true;
-                LOGGER.debug("[DH-VulkanMod] Using VRenderSystem.projection for DH render state.");
-            }
+        state.mcProjectionMatrix = McObjectConverter.convert(VRenderSystem.projection);
+        if (!loggedMatrixFallback) {
+            loggedMatrixFallback = true;
+            LOGGER.debug("[DH-VulkanMod] Using VRenderSystem matrices for DH render state.");
         }
-        if (state.mcModelViewMatrix == null) {
-            if (levelModelView != null) {
-                state.mcModelViewMatrix = McObjectConverter.Convert(levelModelView);
-            } else {
-                state.mcModelViewMatrix = McObjectConverter.Convert(VRenderSystem.modelView);
-            }
+        if (levelModelView != null) {
+            state.mcModelViewMatrix = McObjectConverter.convert(levelModelView);
+        } else {
+            state.mcModelViewMatrix = McObjectConverter.convert(VRenderSystem.modelView);
         }
-        if (state.partialTickTime < 0f) {
-            state.partialTickTime = MinecraftRenderWrapper.INSTANCE.getPartialTickTime();
-        }
+        state.partialTickTime = MinecraftRenderWrapper.INSTANCE.getPartialTickTime();
     }
 }

@@ -34,6 +34,26 @@ layout(set = 0, binding = 0) uniform DhUniforms {
     int uNoiseSteps;
     float uNoiseIntensity;
     int uNoiseDropoff;
+    float uWaterDesaturation;
+    float uCameraY;
+    float uWorldDayTime;
+    float uRainLevel;
+    float uThunderLevel;
+    float uSunrise1;
+    float uSunrise2;
+    float uSunrise3;
+    float uSunrise4;
+    float uSunrise5;
+    float uSunset1;
+    float uSunset2;
+    float uSunset3;
+    float uSunset4;
+    float uSunset5;
+    float uFresnelHeightBaseY;
+    float uFresnelHeightTargetY;
+    float uFresnelHeightTargetMult;
+    float uFresnelHeightMinMult;
+    float uFresnelHeightMaxMult;
 };
 
 
@@ -106,6 +126,62 @@ float bayerMatrix4x4(vec2 st)
 void main()
 {
     fragColor = vertexColor;
+
+    // Water fragment detection (translucent or blue-dominant)
+    if (fragColor.a < 0.99 || (fragColor.b > fragColor.r + 0.05 && fragColor.b > fragColor.g))
+    {
+        // 1. Water Desaturation controlled dynamically by DH Saturation slider
+        float gray = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+        fragColor.rgb = mix(fragColor.rgb, vec3(gray), clamp(uWaterDesaturation, 0.0, 1.0));
+
+        // 2. Precalculated Piecewise Linear Fresnel Transition
+        vec3 normal = normalize(cross(dFdy(vPos.xyz), dFdx(vPos.xyz)));
+        vec3 viewDir = normalize(-vPos.xyz);
+        float NdotV = clamp(dot(normal, viewDir), 0.0, 1.0);
+
+        // Schlick Fresnel term
+        float fresnel = pow(1.0 - NdotV, 4.0);
+
+        // Tick-based brightness mapping (0 to 1) using precalculated arrays
+        const float sunsetCurve[5] = float[](uSunset1, uSunset2, uSunset3, uSunset4, uSunset5);
+        const float sunriseCurve[5] = float[](uSunrise1, uSunrise2, uSunrise3, uSunrise4, uSunrise5);
+
+        float skyBrightness = 1.0;
+        if (uWorldDayTime >= 12000.0 && uWorldDayTime <= 14000.0) {
+            float t = (uWorldDayTime - 12000.0) / 500.0;
+            int idx = int(clamp(floor(t), 0.0, 3.0));
+            skyBrightness = mix(sunsetCurve[idx], sunsetCurve[idx + 1], fract(t));
+        } else if (uWorldDayTime > 14000.0 && uWorldDayTime < 22000.0) {
+            skyBrightness = 0.0;
+        } else if (uWorldDayTime >= 22000.0 && uWorldDayTime <= 24000.0) {
+            float t = (uWorldDayTime - 22000.0) / 500.0;
+            int idx = int(clamp(floor(t), 0.0, 3.0));
+            skyBrightness = mix(sunriseCurve[idx], sunriseCurve[idx + 1], fract(t));
+        }
+
+        // Bright daytime sky gloss tint matching Beryl's sky tone
+        vec3 skyGloss = mix(vertexColor.rgb * 1.5, vec3(0.65, 0.75, 0.85), skyBrightness);
+
+        // Height-based multiplier for fresnel (Squared Curve)
+        // Computes a linear base and squares it. This creates a curve that grows rapidly > 1.0 and falls slowly < 1.0
+        float targetBase = sqrt(uFresnelHeightTargetMult);
+        float diffBase = 1.0 - targetBase;
+        float diffY = uFresnelHeightTargetY - uFresnelHeightBaseY;
+        
+        float slope = (diffY == 0.0) ? 0.0 : diffBase / diffY;
+        float deltaY = uCameraY - uFresnelHeightBaseY;
+        
+        float linearMult = max(0.0, 1.0 - (slope * deltaY));
+        float heightMult = linearMult * linearMult;
+        
+        heightMult = clamp(heightMult, uFresnelHeightMinMult, uFresnelHeightMaxMult);
+
+        fragColor.rgb = mix(fragColor.rgb, skyGloss, fresnel * 0.45 * skyBrightness * heightMult);
+    }
+
+    // Counteract vanilla lightmap darkening during rain/thunder
+    float weatherBoost = 1.0 + (uRainLevel * 1.0) + (uThunderLevel * 1.0);
+    fragColor.rgb *= weatherBoost;
 
     float viewDist = length(vertexWorldPos);
 

@@ -35,6 +35,18 @@ layout(set = 0, binding = 0) uniform DhUniforms {
     int uNoiseSteps;
     float uNoiseIntensity;
     int uNoiseDropoff;
+    float uWaterDesaturation;
+    float uCameraY;
+    float uSunset1;
+    float uSunset2;
+    float uSunset3;
+    float uSunset4;
+    float uSunset5;
+    float uFresnelHeightBaseY;
+    float uFresnelHeightTargetY;
+    float uFresnelHeightTargetMult;
+    float uFresnelHeightMinMult;
+    float uFresnelHeightMaxMult;
 };
 
 #ifdef USE_PUSH_CONSTANTS

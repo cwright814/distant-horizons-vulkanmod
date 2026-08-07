@@ -54,22 +54,15 @@ public class MixinFogRenderer {
     @Inject(
             method = "setupFog",
             at = @At("RETURN"),
-            require = 0,
-            expect = 0
+            require = 0
     )
-    private void dhvulkan$extendFogForBeryl(CallbackInfoReturnable<FogData> cir) {
-        if (!BerylCompat.shouldUseVulkanWithBeryl()) return;
+    private void dhvulkan$extendFogForBeryl(net.minecraft.client.Camera camera, int i, net.minecraft.client.DeltaTracker deltaTracker, float f, net.minecraft.client.multiplayer.ClientLevel clientLevel, CallbackInfoReturnable<org.joml.Vector4f> cir) {
+        if (!com.braffolk.dhvulkan.compat.Compat.isVulkanModActive()) return;
 
-        FogData fogData = cir.getReturnValue();
+        FogData fogData = net.vulkanmod.vulkan.VRenderSystem.getFogData();
         if (fogData == null) return;
 
         try {
-            DhIntegration integration = DhVulkanModEntrypoint.getActiveIntegration();
-            if (integration == null) return;
-
-            VulkanBackend backend = integration.getBackend();
-            if (!(backend instanceof VulkanRenderEngine engine) || !engine.isInitialized()) return;
-
             // Get DH's LOD draw distance in blocks
             int dhLodDist = getDhLodDrawDistance();
             if (dhLodDist <= 0) return;

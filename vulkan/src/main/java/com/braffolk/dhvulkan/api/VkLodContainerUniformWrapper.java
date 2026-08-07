@@ -12,18 +12,8 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.ILodCont
 public class VkLodContainerUniformWrapper implements ILodContainerUniformBufferWrapper {
 
     @Override
-    public void createUniformData(LodBufferContainer bufferContainer) {
+    public void tryUpload(LodBufferContainer bufferContainer) {
         // No-op: Vulkan engine manages uniforms internally
-    }
-
-    @Override
-    public void tryUpload() {
-        // No-op
-    }
-
-    @Override
-    public void upload() {
-        // No-op
     }
 
     @Override

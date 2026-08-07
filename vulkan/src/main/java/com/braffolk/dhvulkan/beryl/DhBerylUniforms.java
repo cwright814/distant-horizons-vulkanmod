@@ -143,11 +143,23 @@ public final class DhBerylUniforms {
             float[] invMv = invertMatrix(mv);
             copyToBuffer("dhModelViewInverse", invMv);
 
+            // Read DH LOD render distance in blocks
+            int dhLodChunks = com.braffolk.dhvulkan.core.DhConfigHelper.lodChunkRenderDistanceRadius();
+            int dhLodBlocks = dhLodChunks > 0 ? dhLodChunks * 16 : Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4;
+
+            // Target exponential fog factor: 95% fog density (x=3.0) at the edge of DH LOD draw distance
+            final float targetFogFactor = 3.0f / (float) dhLodBlocks;
+
+            // Override VulkanMod & Beryl's global FogFactor and FogEnd uniform suppliers directly
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogFactor", () -> targetFogFactor);
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnd", () -> (float) dhLodBlocks);
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogRenderDistanceEnd", () -> (float) dhLodBlocks);
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnvironmentalEnd", () -> (float) dhLodBlocks);
+
             // Scalar uniforms
             MappedBuffer rdBuf = uniformBuffers.get("dhRenderDistance");
             if (rdBuf != null) {
-                int renderDist = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16;
-                rdBuf.putInt(0, renderDist);
+                rdBuf.putInt(0, dhLodBlocks);
             }
 
             MappedBuffer nearBuf = uniformBuffers.get("dhNearPlane");
@@ -157,8 +169,7 @@ public final class DhBerylUniforms {
 
             MappedBuffer farBuf = uniformBuffers.get("dhFarPlane");
             if (farBuf != null) {
-                int renderDist = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16;
-                farBuf.putFloat(0, renderDist * 3000.0f);
+                farBuf.putFloat(0, dhLodBlocks * 3000.0f);
             }
 
             hasPrevFrame = true;
@@ -167,7 +178,7 @@ public final class DhBerylUniforms {
         }
     }
 
-    private static float[] mat4ToArray(com.seibel.distanthorizons.core.util.math.Mat4f mat) {
+    private static float[] mat4ToArray(com.seibel.distanthorizons.core.util.math.DhMat4f mat) {
         return new float[] {
             mat.m00, mat.m10, mat.m20, mat.m30,
             mat.m01, mat.m11, mat.m21, mat.m31,

@@ -16,6 +16,8 @@ allprojects {
         maven { name "ParchmentMC"; url "https://maven.parchmentmc.org" }
         maven { name "Architectury"; url "https://maven.architectury.dev/" }
         maven { name "Sponge"; url "https://repo.spongepowered.org/repository/maven-public/" }
+        maven { name "Terraformers"; url "https://maven.terraformersmc.com/" }
+        maven { name "Shedaniel"; url "https://maven.shedaniel.me/" }
     }
 }
 

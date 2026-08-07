@@ -17,7 +17,7 @@ import com.braffolk.dhvulkan.core.DhConfigHelper;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.util.math.Mat4f;
+import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiFogColorMode;
@@ -100,9 +100,16 @@ public class DhFogPipeline {
                 new VertexFormatElement[] { position });
     }
 
-    // Pipelines
+    private static float customRainFogLevel = 0.0f;
+    private static long lastGameTick = -1;
+
+    private VulkanImage fogTexture;
     private GraphicsPipeline fogComputePipeline;
     private GraphicsPipeline fogApplyPipeline;
+
+    // Weather fog transition state
+    private float weatherFogFactor = 0.0f;
+    private long lastWeatherFrameTimeMs = System.currentTimeMillis();
 
     // Intermediate fog framebuffer (RGBA16F for fog color + alpha)
     private Framebuffer fogFramebuffer;
@@ -123,8 +130,8 @@ public class DhFogPipeline {
     private boolean initialized = false;
 
     // Pre-allocated temp matrices to avoid per-frame heap allocations
-    private final Mat4f tempMvpMatrix = new Mat4f();
-    private final Mat4f tempInvMvpMatrix = new Mat4f();
+    private final DhMat4f tempMvpMatrix = new DhMat4f();
+    private final DhMat4f tempInvMvpMatrix = new DhMat4f();
 
     public void init(int width, int height) {
         if (this.initialized)
@@ -282,7 +289,7 @@ public class DhFogPipeline {
      * Execute fog pipeline: pass 1 (compute fog) + pass 2 (apply fog).
      * Must be called after SSAO but before composite.
      */
-    public void render(DhVulkanFramebuffer dhFramebuffer, Mat4f modelViewMatrix, Mat4f projectionMatrix,
+    public void render(DhVulkanFramebuffer dhFramebuffer, DhMat4f modelViewMatrix, DhMat4f projectionMatrix,
             float partialTicks) {
         if (!this.initialized)
             return;
@@ -300,34 +307,77 @@ public class DhFogPipeline {
         this.tempInvMvpMatrix.invert();
         setUniformMat4(this.pass1Uniforms, "uInvMvmProj", this.tempInvMvpMatrix);
 
-        // Fog color
-        Color fogColor;
-        EDhApiFogColorMode colorMode = Config.Client.Advanced.Graphics.Fog.colorMode.get();
-        if (colorMode == EDhApiFogColorMode.USE_SKY_COLOR) {
-            fogColor = MC_RENDER.getSkyColor();
+        // Fog color — prefer VRenderSystem's active shader fog color when available
+        float fogR, fogG, fogB, fogA;
+        if (net.vulkanmod.vulkan.VRenderSystem.getShaderFogColor() != null) {
+            net.vulkanmod.vulkan.util.MappedBuffer buf = net.vulkanmod.vulkan.VRenderSystem.getShaderFogColor();
+            fogR = buf.getFloat(0);
+            fogG = buf.getFloat(4);
+            fogB = buf.getFloat(8);
+            fogA = buf.getFloat(12);
         } else {
-            fogColor = MC_RENDER.getFogColor(partialTicks);
+            Color fogColor;
+            EDhApiFogColorMode colorMode = Config.Client.Advanced.Graphics.Fog.colorMode.get();
+            if (colorMode == EDhApiFogColorMode.USE_SKY_COLOR) {
+                fogColor = MC_RENDER.getSkyColor();
+            } else {
+                fogColor = MC_RENDER.getFogColor(partialTicks);
+            }
+            fogR = fogColor.getRed() / 255.0f;
+            fogG = fogColor.getGreen() / 255.0f;
+            fogB = fogColor.getBlue() / 255.0f;
+            fogA = fogColor.getAlpha() / 255.0f;
         }
 
-        setUniformVec4(this.pass1Uniforms, "uFogColor",
-                fogColor.getRed() / 255.0f, fogColor.getGreen() / 255.0f,
-                fogColor.getBlue() / 255.0f, fogColor.getAlpha() / 255.0f);
+        setUniformVec4(this.pass1Uniforms, "uFogColor", fogR, fogG, fogB, fogA);
 
         // Fog scales
         int lodDrawDistance = DhConfigHelper.lodChunkRenderDistanceRadius()
                 * LodUtil.CHUNK_WIDTH;
+        fillPass1Uniforms(lodDrawDistance, dhDepthTexture, dhFramebuffer, partialTicks);
+    }
+
+    private void fillPass1Uniforms(int lodDrawDistance, VulkanImage dhDepthTexture, DhVulkanFramebuffer dhFramebuffer, float partialTicks) {
         setUniformFloat(this.pass1Uniforms, "uFogScale", 1.0f / lodDrawDistance);
         setUniformFloat(this.pass1Uniforms, "uFogVerticalScale", 1.0f / MC.getWrappedClientLevel().getMaxHeight());
         setUniformInt(this.pass1Uniforms, "uFogDebugMode", 0);
-        setUniformInt(this.pass1Uniforms, "uFogFalloffType",
-                Config.Client.Advanced.Graphics.Fog.farFogFalloff.get().value);
-
-        // Far fog config
+        // Far fog config from DH in-game settings
         float farFogStart = DhConfigHelper.farFogStart();
         float farFogEnd = DhConfigHelper.farFogEnd();
         float farFogMin = DhConfigHelper.farFogMin();
         float farFogMax = DhConfigHelper.farFogMax();
         float farFogDensity = DhConfigHelper.farFogDensity();
+        int falloffType = Config.Client.Advanced.Graphics.Fog.farFogFalloff.get().value;
+        try {
+            net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+            if (level != null) {
+                boolean isRaining = level.isRaining();
+                long currentTick = level.getGameTime();
+                if (lastGameTick == -1 || currentTick < lastGameTick || currentTick > lastGameTick + 100) {
+                    lastGameTick = currentTick;
+                }
+                long deltaTicks = currentTick - lastGameTick;
+                lastGameTick = currentTick;
+                
+                float deltaFogIn = (float)deltaTicks / 62.5f; // 25% longer than 50
+                float deltaFogOut = (float)deltaTicks / 37.5f; // 25% shorter than 50
+                
+                if (isRaining) {
+
+                    customRainFogLevel = Math.min(1.0f, customRainFogLevel + deltaFogIn);
+                } else {
+                    customRainFogLevel = Math.max(0.0f, customRainFogLevel - deltaFogOut);
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
+        if (customRainFogLevel > 0.0f) {
+            farFogMin = Math.max(farFogMin, 0.80f * customRainFogLevel);
+            farFogMax = Math.max(farFogMax, farFogMin);
+        }
+
 
         // Override fog if underwater
         if (MC_RENDER.isFogStateSpecial()) {
@@ -335,6 +385,7 @@ public class DhFogPipeline {
             farFogEnd = 0.0f;
         }
 
+        setUniformInt(this.pass1Uniforms, "uFogFalloffType", falloffType);
         setUniformFloat(this.pass1Uniforms, "uFarFogStart", farFogStart);
         setUniformFloat(this.pass1Uniforms, "uFarFogLength", farFogEnd - farFogStart);
         setUniformFloat(this.pass1Uniforms, "uFarFogMin", farFogMin);
@@ -355,6 +406,11 @@ public class DhFogPipeline {
         float heightFogMin = DhConfigHelper.heightFogMin();
         float heightFogMax = DhConfigHelper.heightFogMax();
         float heightFogDensity = DhConfigHelper.heightFogDensity();
+
+        if (customRainFogLevel > 0.0f) {
+            heightFogMin = Math.max(heightFogMin, 0.80f * customRainFogLevel);
+            heightFogMax = Math.max(heightFogMax, heightFogMin);
+        }
 
         setUniformFloat(this.pass1Uniforms, "uHeightFogStart", heightFogStart);
         setUniformFloat(this.pass1Uniforms, "uHeightFogLength", heightFogEnd - heightFogStart);
@@ -530,7 +586,7 @@ public class DhFogPipeline {
         Compat.addUniformWithBuffer(builder, type, name, count, () -> mb);
     }
 
-    private void setUniformMat4(Map<String, MappedBuffer> uniforms, String name, Mat4f matrix) {
+    private void setUniformMat4(Map<String, MappedBuffer> uniforms, String name, DhMat4f matrix) {
         MappedBuffer mb = uniforms.get(name);
         if (mb == null)
             return;

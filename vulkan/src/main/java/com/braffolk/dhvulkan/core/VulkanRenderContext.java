@@ -12,8 +12,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.math.Mat4f;
-import com.seibel.distanthorizons.core.util.math.Vec3f;
+import com.seibel.distanthorizons.core.util.math.DhMat4f;
+import com.seibel.distanthorizons.core.util.math.DhVec3f;
 import net.vulkanmod.vulkan.Drawer;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
@@ -191,6 +191,27 @@ public class VulkanRenderContext {
         addDhUniform(uboBuilder, "int", "uNoiseSteps", 1, 4);
         addDhUniform(uboBuilder, "float", "uNoiseIntensity", 1, 4);
         addDhUniform(uboBuilder, "int", "uNoiseDropoff", 1, 4);
+        addDhUniform(uboBuilder, "float", "uWaterDesaturation", 1, 4);
+        addDhUniform(uboBuilder, "float", "uCameraY", 1, 4);
+        addDhUniform(uboBuilder, "float", "uWorldDayTime", 1, 4);
+        addDhUniform(uboBuilder, "float", "uRainLevel", 1, 4);
+        addDhUniform(uboBuilder, "float", "uThunderLevel", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunrise1", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunrise2", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunrise3", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunrise4", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunrise5", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunset1", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunset2", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunset3", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunset4", 1, 4);
+        addDhUniform(uboBuilder, "float", "uSunset5", 1, 4);
+        
+        addDhUniform(uboBuilder, "float", "uFresnelHeightBaseY", 1, 4);
+        addDhUniform(uboBuilder, "float", "uFresnelHeightTargetY", 1, 4);
+        addDhUniform(uboBuilder, "float", "uFresnelHeightTargetMult", 1, 4);
+        addDhUniform(uboBuilder, "float", "uFresnelHeightMinMult", 1, 4);
+        addDhUniform(uboBuilder, "float", "uFresnelHeightMaxMult", 1, 4);
 
         UBO mainUbo = uboBuilder.buildUBO(0, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
         // VM 0.4.2: uniforms' setSupplier() auto-lookup only finds MC's built-in
@@ -231,7 +252,7 @@ public class VulkanRenderContext {
     // ===================//
 
     /** Write a mat4 uniform value (column-major for std140 layout) */
-    public void setUniformMat4(String name, Mat4f matrix) {
+    public void setUniformMat4(String name, DhMat4f matrix) {
         MappedBuffer mb = this.uniformBuffers.get(name);
         if (mb == null)
             return;
@@ -259,7 +280,7 @@ public class VulkanRenderContext {
     }
 
     /** Write a vec3 uniform value */
-    public void setUniformVec3f(String name, Vec3f value) {
+    public void setUniformVec3f(String name, DhVec3f value) {
         MappedBuffer mb = this.uniformBuffers.get(name);
         if (mb == null)
             return;
@@ -273,7 +294,7 @@ public class VulkanRenderContext {
      * Write model offset directly (hot path, ~200× per frame).
      * Uses direct field reference — no HashMap lookup.
      */
-    public void setModelOffset(Vec3f value) {
+    public void setModelOffset(DhVec3f value) {
         this.modelOffsetBuffer.putFloat(0, value.x);
         this.modelOffsetBuffer.putFloat(4, value.y);
         this.modelOffsetBuffer.putFloat(8, value.z);

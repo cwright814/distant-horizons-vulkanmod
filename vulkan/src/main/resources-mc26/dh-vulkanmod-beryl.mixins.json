@@ -10,7 +10,8 @@
         "MixinShaderRenderPipeline",
         "MixinBerylPipelineConfigs",
         "MixinBerylVulkan",
-        "MixinFogRenderer"
+        "MixinFogRenderer",
+        "MixinShaderLoadUtil"
     ],
     "injectors": {
         "defaultRequire": 0

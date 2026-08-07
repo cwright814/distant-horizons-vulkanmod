@@ -42,22 +42,20 @@ public class MixinDependencySetup {
             // Config may not be loadable this early; ignore
         }
 
-        // Read DH's rendering API config to decide whether to use Vulkan
-        boolean useVulkan = false;
+        // Read DH's rendering API config to decide whether to use Vulkan.
+        // In DH 3.2+ on MC 26.1.2, BLAZE_3D or AUTO are used for modern rendering backends.
+        boolean useVulkan = true;
         try {
             Object apiEnum = com.seibel.distanthorizons.core.config.Config
-                    .Client.Advanced.Graphics.Experimental.renderingApi.get();
+                    .Client.Advanced.Graphics.Experimental.renderingEngine.get();
             String apiName = apiEnum.toString();
 
-            if ("AUTO".equals(apiName)) {
-                // AUTO + VulkanMod installed → use Vulkan (the best available renderer)
-                useVulkan = true;
+            if ("OPEN_GL".equals(apiName)) {
+                // User explicitly requested legacy OPEN_GL renderer
+                useVulkan = false;
             }
-            // OPEN_GL or BLAZE_3D → don't cancel; let DH's original code handle it
         } catch (Exception e) {
-            // Config access failed (shouldn't happen but be safe)
-            // Fall back to Vulkan when VulkanMod is active
-            LOGGER.debug("[DH-Vulkan] Could not read DH renderingApi config, defaulting to Vulkan: {}",
+            LOGGER.debug("[DH-Vulkan] Could not read DH renderingEngine config, defaulting to Vulkan: {}",
                     e.getMessage());
             useVulkan = true;
         }
@@ -67,16 +65,9 @@ public class MixinDependencySetup {
         }
 
         if (!useVulkan) {
-            // User explicitly chose OPEN_GL or BLAZE_3D — let DH use the selected API
-            String selectedApi;
-            try {
-                selectedApi = com.seibel.distanthorizons.core.config.Config
-                        .Client.Advanced.Graphics.Experimental.renderingApi.get().toString();
-            } catch (Exception ex) {
-                selectedApi = "unknown";
-            }
-            LOGGER.info("[DH-VulkanMod] DH rendering API set to {} — DH-VulkanMod Vulkan renderer disabled. " +
-                    "Set to AUTO or enable forceVulkanRendering in dh-vulkanmod.json to use Vulkan.", selectedApi);
+            // User explicitly chose OPEN_GL — let DH use the legacy OpenGL API
+            LOGGER.info("[DH-VulkanMod] DH rendering API set to OPEN_GL — DH-VulkanMod Vulkan renderer disabled. " +
+                    "Set to BLAZE_3D/AUTO or enable forceVulkanRendering in dh-vulkanmod.json to use Vulkan.");
             return;
         }
 

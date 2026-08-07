@@ -20,8 +20,8 @@ import com.braffolk.dhvulkan.core.pipeline.DhFogPipeline;
 import com.braffolk.dhvulkan.core.pipeline.DhSsaoPipeline;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigEntryAppearance;
-import com.seibel.distanthorizons.core.util.math.Mat4f;
-import com.seibel.distanthorizons.core.util.math.Vec3f;
+import com.seibel.distanthorizons.core.util.math.DhMat4f;
+import com.seibel.distanthorizons.core.util.math.DhVec3f;
 import net.minecraft.client.Minecraft;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
@@ -47,18 +47,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class VulkanRenderEngine implements VulkanBackend {
     private static final Logger LOGGER = LogManager.getLogger("DH-VulkanEngine");
-    private static final Vec3f VEC3F_ZERO = new Vec3f(0, 0, 0);
+    private static final DhVec3f VEC3F_ZERO = new DhVec3f(0, 0, 0);
+
+    private static java.lang.reflect.Method cachedDayTimeMethod = null;
+    private static int cachedDayTimeTarget = 0;
 
     // Pre-allocated reusable objects to avoid per-frame heap allocations
-    private final Mat4f tempCombinedMatrix = new Mat4f();
-    private final Mat4f tempInvProj = new Mat4f();
+    private final DhMat4f tempCombinedMatrix = new DhMat4f();
+    private final DhMat4f tempInvProj = new DhMat4f();
     private final float[] tempInvProjArray = new float[16];
     private final float[] tempMcProjArray = new float[16];
     private final float[] tempInvMcMvmProjArray = new float[16];
 
 
-
     private final VulkanRenderContext renderContext;
+    private static float customRainLevel = 0.0f;
+    private static float customThunderLevel = 0.0f;
+    private static long lastGameTick = -1;
+
     private boolean initialized = false;
     private boolean initFailed = false;
 
@@ -334,6 +340,90 @@ public class VulkanRenderEngine implements VulkanBackend {
                 DhConfigHelper.noiseIntensity()));
         this.renderContext.setUniformInt("uNoiseDropoff", DhConfigHelper.noiseDropoff());
         this.renderContext.setUniformBool("uIsWhiteWorld", DhConfigHelper.whiteWorldEnabled());
+
+        // Water desaturation mapped to DH's Saturation Multiplier slider
+        float satMult = DhConfigHelper.saturationMultiplier();
+        float waterDesat = Math.max(0.0f, Math.min(1.0f, 1.0f - (satMult - 0.4f)));
+        this.renderContext.setUniformFloat("uWaterDesaturation", waterDesat);
+
+        float worldDayTime = 0.0f;
+        try {
+            if (Minecraft.getInstance().level != null) {
+                #if MC_VER >= MC_26_1_2
+                worldDayTime = (float) (Minecraft.getInstance().level.getOverworldClockTime() % 24000L);
+                #else
+                worldDayTime = (float) (Minecraft.getInstance().level.getDayTime() % 24000L);
+                #endif
+                if (worldDayTime < 0) worldDayTime += 24000L;
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+        this.renderContext.setUniformFloat("uWorldDayTime", worldDayTime);
+
+        float cameraY = 80.0f;
+        try {
+            cameraY = (float) com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector.INSTANCE.get(com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper.class).getCameraExactPosition().y;
+        } catch (Exception e) {}
+        this.renderContext.setUniformFloat("uCameraY", cameraY);
+        this.renderContext.setUniformFloat("uFresnelHeightBaseY", DhVulkanConfig.get().fresnelHeightBaseY);
+        this.renderContext.setUniformFloat("uFresnelHeightTargetY", DhVulkanConfig.get().fresnelHeightTargetY);
+        this.renderContext.setUniformFloat("uFresnelHeightTargetMult", DhVulkanConfig.get().fresnelHeightTargetMult);
+        this.renderContext.setUniformFloat("uFresnelHeightMinMult", DhVulkanConfig.get().fresnelHeightMinMult);
+        this.renderContext.setUniformFloat("uFresnelHeightMaxMult", DhVulkanConfig.get().fresnelHeightMaxMult);
+
+        float rainLevel = 0.0f;
+        float thunderLevel = 0.0f;
+        try {
+            net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+            if (level != null) {
+                boolean isRaining = level.isRaining();
+                boolean isThundering = level.isThundering();
+                
+                long currentTick = level.getGameTime();
+                if (lastGameTick == -1 || currentTick < lastGameTick || currentTick > lastGameTick + 100) {
+                    lastGameTick = currentTick;
+                }
+                long deltaTicks = currentTick - lastGameTick;
+                lastGameTick = currentTick;
+                
+                float deltaLevelIn = (float)deltaTicks / 125.0f; // 25% longer than 100
+                float deltaLevelOut = (float)deltaTicks / 25.0f; // 25% shorter than 33.33
+                
+                if (isRaining) {
+                    customRainLevel = Math.min(1.0f, customRainLevel + deltaLevelIn);
+                } else {
+                    customRainLevel = Math.max(0.0f, customRainLevel - deltaLevelOut);
+                }
+                
+                if (isThundering) {
+                    customThunderLevel = Math.min(1.0f, customThunderLevel + deltaLevelIn);
+                } else {
+                    customThunderLevel = Math.max(0.0f, customThunderLevel - deltaLevelOut);
+                }
+                
+                rainLevel = customRainLevel;
+                thunderLevel = customThunderLevel;
+            }
+        } catch (Exception e) {}
+        this.renderContext.setUniformFloat("uRainLevel", rainLevel);
+        this.renderContext.setUniformFloat("uThunderLevel", thunderLevel);
+
+
+        // Send Fresnel arrays from config to shader
+        DhVulkanConfig cfg = DhVulkanConfig.get();
+        this.renderContext.setUniformFloat("uSunrise1", cfg.sunriseCurve[0]);
+        this.renderContext.setUniformFloat("uSunrise2", cfg.sunriseCurve[1]);
+        this.renderContext.setUniformFloat("uSunrise3", cfg.sunriseCurve[2]);
+        this.renderContext.setUniformFloat("uSunrise4", cfg.sunriseCurve[3]);
+        this.renderContext.setUniformFloat("uSunrise5", cfg.sunriseCurve[4]);
+
+        this.renderContext.setUniformFloat("uSunset1", cfg.sunsetCurve[0]);
+        this.renderContext.setUniformFloat("uSunset2", cfg.sunsetCurve[1]);
+        this.renderContext.setUniformFloat("uSunset3", cfg.sunsetCurve[2]);
+        this.renderContext.setUniformFloat("uSunset4", cfg.sunsetCurve[3]);
+        this.renderContext.setUniformFloat("uSunset5", cfg.sunsetCurve[4]);
+
         this.renderContext.setUniformVec3f("uModelOffset", VEC3F_ZERO);
 
         // Upload UBOs after setting all uniforms
@@ -344,7 +434,7 @@ public class VulkanRenderEngine implements VulkanBackend {
     }
 
     @Override
-    public void setModelOffset(Vec3f modelOffset) {
+    public void setModelOffset(DhVec3f modelOffset) {
         if (this.initFailed)
             return;
         this.renderContext.setModelOffset(modelOffset);
@@ -475,7 +565,7 @@ public class VulkanRenderEngine implements VulkanBackend {
             // When Beryl is active, skip DH's own fog pipeline to prevent double-fogging.
             // Beryl's atmospheric fog + render distance fog will handle fog for both
             // MC terrain and composited DH LODs via the extended FogEnd (see MixinFogRenderer).
-            if (this.fogPipeline != null && DhConfigHelper.dhFogEnabled() && !this.berylPath) {
+            if (this.fogPipeline != null && DhConfigHelper.dhFogEnabled()) {
                 this.profiler.begin(DhFrameProfiler.PHASE_FOG);
                 try {
                     this.tempCombinedMatrix.set(uniforms.dhModelViewMatrix);

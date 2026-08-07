@@ -57,6 +57,14 @@ public final class DhConfigHelper {
         return toInt(Config.Client.Advanced.Graphics.NoiseTexture.noiseSteps.get());
     }
 
+    public static float saturationMultiplier() {
+        try {
+            return toFloat(Config.Client.Advanced.Graphics.Quality.saturationMultiplier.get());
+        } catch (Exception e) {
+            return 1.0f;
+        }
+    }
+
     public static float noiseIntensity() {
         Object raw = Config.Client.Advanced.Graphics.NoiseTexture.noiseIntensity.get();
         float value = toFloat(raw);

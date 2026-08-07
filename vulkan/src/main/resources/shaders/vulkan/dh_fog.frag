@@ -158,6 +158,7 @@ float getHeightFogThickness(float dist)
 
 float linearFog(float worldDist, float fogStart, float fogLength, float fogMin, float fogRange)
 {
+    fogLength = max(fogLength, 0.0001);
     worldDist = (worldDist - fogStart) / fogLength;
     worldDist = clamp(worldDist, 0.0, 1.0);
     return fogMin + fogRange * worldDist;
@@ -167,6 +168,7 @@ float exponentialFog(
     float x, float fogStart, float fogLength,
     float fogMin, float fogRange, float fogDensity)
 {
+    fogLength = max(fogLength, 0.0001);
     x = max((x - fogStart) / fogLength, 0.0) * fogDensity;
     return fogMin + fogRange - fogRange / exp(x);
 }
@@ -175,6 +177,7 @@ float exponentialSquaredFog(
     float x, float fogStart, float fogLength,
     float fogMin, float fogRange, float fogDensity)
 {
+    fogLength = max(fogLength, 0.0001);
     x = max((x - fogStart) / fogLength, 0.0) * fogDensity;
     return fogMin + fogRange - fogRange / exp(x * x);
 }

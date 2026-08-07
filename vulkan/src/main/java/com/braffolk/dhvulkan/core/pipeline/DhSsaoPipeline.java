@@ -15,7 +15,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.util.RenderUtil;
-import com.seibel.distanthorizons.core.util.math.Mat4f;
+import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.framebuffer.Framebuffer;
@@ -110,7 +110,7 @@ public class DhSsaoPipeline {
     private boolean initialized = false;
 
     // Pre-allocated temp matrix to avoid per-frame heap allocation
-    private final Mat4f tempInvProj = new Mat4f();
+    private final DhMat4f tempInvProj = new DhMat4f();
 
     // [DH 2.4 COMPAT] RenderUtil.getFarClipPlaneDistanceInBlocks() returns int in
     // DH 2.4 but float in DH 3.0. JVM treats return type as part of the method
@@ -326,7 +326,7 @@ public class DhSsaoPipeline {
      *                         rendering
      * @param projectionMatrix DH's projection matrix for depth reconstruction
      */
-    public void render(DhVulkanFramebuffer dhFramebuffer, Mat4f projectionMatrix) {
+    public void render(DhVulkanFramebuffer dhFramebuffer, DhMat4f projectionMatrix) {
         if (!this.initialized) {
             return;
         }
@@ -528,7 +528,7 @@ public class DhSsaoPipeline {
         Compat.addUniformWithBuffer(builder, type, name, count, () -> mb);
     }
 
-    private void setUniformMat4(Map<String, MappedBuffer> uniforms, String name, Mat4f matrix) {
+    private void setUniformMat4(Map<String, MappedBuffer> uniforms, String name, DhMat4f matrix) {
         MappedBuffer mb = uniforms.get(name);
         if (mb == null)
             return;

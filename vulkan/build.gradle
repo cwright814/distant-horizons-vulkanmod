@@ -49,9 +49,9 @@ manifold {
     manifoldVersion = "2025.1.31"
 }
 
-def dhJar = fileTree("${rootDir}/jars").matching { include "DistantHorizons-*-${mcVer}-*.jar" }.files
-def vmJar = fileTree("${rootDir}/jars").matching { include "VulkanMod_${mcVer}-*.jar" }.files
-def blJar = fileTree("${rootDir}/jars").matching { include "beryl_${mcVer}-*.jar" }.files
+def dhJar = fileTree("${rootDir}/jars").matching { include "*DistantHorizons*${mcVer}*.jar" }.files
+def vmJar = fileTree("${rootDir}/jars").matching { include "*VulkanMod*${mcVer}*.jar" }.files
+def blJar = fileTree("${rootDir}/jars").matching { include "*beryl*${mcVer}*.jar" }.files
 
 if (dhJar.isEmpty()) throw new GradleException("No DH jar found for MC ${mcVer} in jars/")
 if (vmJar.isEmpty()) throw new GradleException("No VulkanMod jar found for MC ${mcVer} in jars/")
@@ -63,6 +63,10 @@ dependencies {
     if (isUnobfuscatedMc) {
         implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
         implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+        def modMenuJar = fileTree("${rootDir}/jars").matching { include "*modmenu*.jar" }.files
+        def clothConfigJar = fileTree("${rootDir}/jars").matching { include "*cloth-config*.jar" }.files
+        if (!modMenuJar.isEmpty()) compileOnly files(modMenuJar.first())
+        if (!clothConfigJar.isEmpty()) compileOnly files(clothConfigJar.first())
         dhJar.each { compileOnly files(it) }
         compileOnly files(vmJar.first())
         compileOnly files(blJar.first())
@@ -73,6 +77,10 @@ dependencies {
         }
         modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
         modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+        def modMenuJar = fileTree("${rootDir}/jars").matching { include "*modmenu*.jar" }.files
+        def clothConfigJar = fileTree("${rootDir}/jars").matching { include "*cloth-config*.jar" }.files
+        if (!modMenuJar.isEmpty()) modCompileOnly files(modMenuJar.first())
+        if (!clothConfigJar.isEmpty()) modCompileOnly files(clothConfigJar.first())
         dhJar.each { modCompileOnly files(it) }
         modCompileOnly files(vmJar.first())
         modCompileOnly files(blJar.first())
