@@ -29,7 +29,7 @@ LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling 
 - Noise / dithering on LODs
 - Fade / clip distance transitions
 - Earth curvature rendering
-- Cloud rendering with correct depth against LOD terrain (VM 0.6+)
+- ~~Cloud rendering with correct depth against LOD terrain (VM 0.6+)~~
 - Weather effects (rain, snow) render correctly in front of LODs
 
 ### ⚠️ Not Yet Implemented
