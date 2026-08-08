@@ -51,6 +51,7 @@ layout(set = 0, binding = 0) uniform DhUniforms {
     float uSunset5;
     float uFresnelHeightBaseY;
     float uFresnelHeightTargetY;
+    float uFresnelHeightBaseMult;
     float uFresnelHeightTargetMult;
     float uFresnelHeightMinMult;
     float uFresnelHeightMaxMult;
@@ -164,14 +165,15 @@ void main()
 
         // Height-based multiplier for fresnel (Squared Curve)
         // Computes a linear base and squares it. This creates a curve that grows rapidly > 1.0 and falls slowly < 1.0
+        float baseMultSqrt = sqrt(uFresnelHeightBaseMult);
         float targetBase = sqrt(uFresnelHeightTargetMult);
-        float diffBase = 1.0 - targetBase;
+        float diffBase = baseMultSqrt - targetBase;
         float diffY = uFresnelHeightTargetY - uFresnelHeightBaseY;
         
         float slope = (diffY == 0.0) ? 0.0 : diffBase / diffY;
         float deltaY = uCameraY - uFresnelHeightBaseY;
         
-        float linearMult = max(0.0, 1.0 - (slope * deltaY));
+        float linearMult = max(0.0, baseMultSqrt - (slope * deltaY));
         float heightMult = linearMult * linearMult;
         
         heightMult = clamp(heightMult, uFresnelHeightMinMult, uFresnelHeightMaxMult);

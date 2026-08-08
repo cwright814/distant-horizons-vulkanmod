@@ -54,12 +54,64 @@ public class DhVulkanConfig {
      */
     public float[] sunsetCurve = new float[]{1.0f, 0.96f, 0.85f, 0.55f, 0.0f};
 
+    public enum FresnelPreset {
+        CHUNKS_12("12 Chunks"),
+        CHUNKS_20("20 Chunks"),
+        CHUNKS_32("32 Chunks"),
+        CUSTOM("Custom");
+
+        private final String displayName;
+        FresnelPreset(String displayName) {
+            this.displayName = displayName;
+        }
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
     /** Fresnel height scaling values */
-    public float fresnelHeightBaseY = 85.0f;
-    public float fresnelHeightTargetY = 125.0f;
-    public float fresnelHeightTargetMult = 0.1f;
-    public float fresnelHeightMinMult = -0.125f;
-    public float fresnelHeightMaxMult = 2.0f;
+    public FresnelPreset fresnelPreset = FresnelPreset.CHUNKS_12;
+    public float fresnelHeightBaseY = 70.0f;
+    public float fresnelHeightTargetY = 105.0f;
+    public float fresnelHeightBaseMult = 2.4f;
+    public float fresnelHeightTargetMult = 1.0f;
+    public float fresnelHeightMinMult = 0.2f;
+    public float fresnelHeightMaxMult = 3.0f;
+
+    public void applyPreset(FresnelPreset preset) {
+        if (preset == FresnelPreset.CUSTOM) return;
+
+        // For now, all presets share the same default values.
+        // We prep the structure so they can be changed easily later.
+        switch (preset) {
+            case CHUNKS_20:
+                this.fresnelHeightBaseY = 80.0f;
+                this.fresnelHeightTargetY = 130.0f;
+                this.fresnelHeightBaseMult = 2.2f;
+                this.fresnelHeightTargetMult = 1.0f;
+                this.fresnelHeightMinMult = 0.4f;
+                this.fresnelHeightMaxMult = 3.0f;
+                break;
+            case CHUNKS_32:
+                this.fresnelHeightBaseY = 100.0f;
+                this.fresnelHeightTargetY = 180.0f;
+                this.fresnelHeightBaseMult = 2.25f;
+                this.fresnelHeightTargetMult = 1.0f;
+                this.fresnelHeightMinMult = 0.7f;
+                this.fresnelHeightMaxMult = 3.0f;
+                break;
+            case CHUNKS_12:
+            default:
+                this.fresnelHeightBaseY = 70.0f;
+                this.fresnelHeightTargetY = 105.0f;
+                this.fresnelHeightBaseMult = 2.4f;
+                this.fresnelHeightTargetMult = 1.0f;
+                this.fresnelHeightMinMult = 0.2f;
+                this.fresnelHeightMaxMult = 3.0f;
+                break;
+        }
+        this.fresnelPreset = preset;
+    }
 
     // ---- Load / Save ----
 

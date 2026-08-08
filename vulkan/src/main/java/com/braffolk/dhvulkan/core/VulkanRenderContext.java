@@ -209,6 +209,7 @@ public class VulkanRenderContext {
         
         addDhUniform(uboBuilder, "float", "uFresnelHeightBaseY", 1, 4);
         addDhUniform(uboBuilder, "float", "uFresnelHeightTargetY", 1, 4);
+        addDhUniform(uboBuilder, "float", "uFresnelHeightBaseMult", 1, 4);
         addDhUniform(uboBuilder, "float", "uFresnelHeightTargetMult", 1, 4);
         addDhUniform(uboBuilder, "float", "uFresnelHeightMinMult", 1, 4);
         addDhUniform(uboBuilder, "float", "uFresnelHeightMaxMult", 1, 4);

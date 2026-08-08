@@ -21,15 +21,72 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                 .setParentScreen(parent)
                 .setTitle(Component.literal("DH-VulkanMod Configuration"));
 
+        DhVulkanConfig.FresnelPreset initPreset = cfg.fresnelPreset;
+        float initBaseY = cfg.fresnelHeightBaseY;
+        float initTargetY = cfg.fresnelHeightTargetY;
+        float initBaseM = cfg.fresnelHeightBaseMult;
+        float initTargetM = cfg.fresnelHeightTargetMult;
+        float initMinM = cfg.fresnelHeightMinMult;
+        float initMaxM = cfg.fresnelHeightMaxMult;
+
         builder.setSavingRunnable(() -> {
+            boolean presetChanged = cfg.fresnelPreset != initPreset;
+            boolean valuesTweaked =
+                    cfg.fresnelHeightBaseY != initBaseY ||
+                    cfg.fresnelHeightTargetY != initTargetY ||
+                    cfg.fresnelHeightBaseMult != initBaseM ||
+                    cfg.fresnelHeightTargetMult != initTargetM ||
+                    cfg.fresnelHeightMinMult != initMinM ||
+                    cfg.fresnelHeightMaxMult != initMaxM;
+
+            if (presetChanged && !valuesTweaked) {
+                // Only the preset was changed, apply the preset values.
+                cfg.applyPreset(cfg.fresnelPreset);
+            } else if (valuesTweaked) {
+                // Custom tweaks override everything.
+                cfg.fresnelPreset = DhVulkanConfig.FresnelPreset.CUSTOM;
+            }
+
             cfg.save();
         });
 
+        ConfigCategory fresnelCategory = builder.getOrCreateCategory(Component.literal("Water Fresnel"));
+        ConfigCategory generalCategory = builder.getOrCreateCategory(Component.literal("General"));
         ConfigCategory sunriseCategory = builder.getOrCreateCategory(Component.literal("Sunrise Curve"));
         ConfigCategory sunsetCategory = builder.getOrCreateCategory(Component.literal("Sunset Curve"));
-        ConfigCategory generalCategory = builder.getOrCreateCategory(Component.literal("General"));
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
+
+        // Water Fresnel
+        fresnelCategory.addEntry(entryBuilder.startEnumSelector(Component.literal("Preset"), DhVulkanConfig.FresnelPreset.class, cfg.fresnelPreset)
+                .setDefaultValue(DhVulkanConfig.FresnelPreset.CHUNKS_12)
+                .setEnumNameProvider(preset -> Component.literal(((DhVulkanConfig.FresnelPreset) preset).getDisplayName()))
+                .setSaveConsumer(newValue -> cfg.fresnelPreset = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Base Y Level"), cfg.fresnelHeightBaseY)
+                .setDefaultValue(70.0f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightBaseY = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Y Level"), cfg.fresnelHeightTargetY)
+                .setDefaultValue(105.0f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightTargetY = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Base Multiplier"), cfg.fresnelHeightBaseMult)
+                .setDefaultValue(2.4f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightBaseMult = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Multiplier"), cfg.fresnelHeightTargetMult)
+                .setDefaultValue(1.0f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightTargetMult = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Min Multiplier"), cfg.fresnelHeightMinMult)
+                .setDefaultValue(0.2f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightMinMult = newValue)
+                .build());
+        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Max Multiplier"), cfg.fresnelHeightMaxMult)
+                .setDefaultValue(3.0f)
+                .setSaveConsumer(newValue -> cfg.fresnelHeightMaxMult = newValue)
+                .build());
 
         // General
         generalCategory.addEntry(entryBuilder.startBooleanToggle(Component.literal("Force Vulkan Rendering"), cfg.forceVulkanRendering)
@@ -60,28 +117,6 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                     .setSaveConsumer(newValue -> cfg.sunsetCurve[finalI] = newValue)
                     .build());
         }
-
-        ConfigCategory fresnelCategory = builder.getOrCreateCategory(Component.literal("Fresnel Height"));
-        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Base Y Level"), cfg.fresnelHeightBaseY)
-                .setDefaultValue(85.0f)
-                .setSaveConsumer(newValue -> cfg.fresnelHeightBaseY = newValue)
-                .build());
-        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Y Level"), cfg.fresnelHeightTargetY)
-                .setDefaultValue(125.0f)
-                .setSaveConsumer(newValue -> cfg.fresnelHeightTargetY = newValue)
-                .build());
-        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Target Multiplier"), cfg.fresnelHeightTargetMult)
-                .setDefaultValue(0.1f)
-                .setSaveConsumer(newValue -> cfg.fresnelHeightTargetMult = newValue)
-                .build());
-        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Min Multiplier"), cfg.fresnelHeightMinMult)
-                .setDefaultValue(-0.125f)
-                .setSaveConsumer(newValue -> cfg.fresnelHeightMinMult = newValue)
-                .build());
-        fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Max Multiplier"), cfg.fresnelHeightMaxMult)
-                .setDefaultValue(2.0f)
-                .setSaveConsumer(newValue -> cfg.fresnelHeightMaxMult = newValue)
-                .build());
 
         return builder.build();
     }

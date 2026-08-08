@@ -368,6 +368,7 @@ public class VulkanRenderEngine implements VulkanBackend {
         this.renderContext.setUniformFloat("uCameraY", cameraY);
         this.renderContext.setUniformFloat("uFresnelHeightBaseY", DhVulkanConfig.get().fresnelHeightBaseY);
         this.renderContext.setUniformFloat("uFresnelHeightTargetY", DhVulkanConfig.get().fresnelHeightTargetY);
+        this.renderContext.setUniformFloat("uFresnelHeightBaseMult", DhVulkanConfig.get().fresnelHeightBaseMult);
         this.renderContext.setUniformFloat("uFresnelHeightTargetMult", DhVulkanConfig.get().fresnelHeightTargetMult);
         this.renderContext.setUniformFloat("uFresnelHeightMinMult", DhVulkanConfig.get().fresnelHeightMinMult);
         this.renderContext.setUniformFloat("uFresnelHeightMaxMult", DhVulkanConfig.get().fresnelHeightMaxMult);
