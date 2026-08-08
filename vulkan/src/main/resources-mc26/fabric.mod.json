@@ -32,5 +32,9 @@
         "minecraft": ["26.1", "26.1.1", "26.1.2"],
         "distanthorizons": ">=3.0.0-",
         "vulkanmod": "${vulkanmod_min_version}"
+    },
+    "suggests": {
+        "not-enough-vulkan": "*",
+        "bobby": "*"
     }
 }
