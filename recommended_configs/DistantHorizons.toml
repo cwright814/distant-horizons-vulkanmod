@@ -138,11 +138,11 @@ _version = 4
 		#
 		# If enabled, the mod will log information about the renderer setup, cleanup, and any issues it may encounter. 
 		# This can be useful for debugging.
-		logRendererEventToFile = "INFO"
+		logRendererEventToFile = "ERROR"
 		#
 		# If enabled, the mod will log information about the world generation process. 
 		# This can be useful for debugging.
-		logWorldGenEventToFile = "INFO"
+		logWorldGenEventToFile = "ERROR"
 		#
 		# If enabled, the mod will log information about the renderer OpenGL process. 
 		# This can be useful for debugging.
@@ -153,21 +153,21 @@ _version = 4
 		#
 		# If enabled, the mod will log information about the world generation process. 
 		# This can be useful for debugging.
-		logWorldGenChunkLoadEventToFile = "INFO"
+		logWorldGenChunkLoadEventToFile = "ERROR"
 		#
 		# If enabled, the mod will log information about the renderer OpenGL process. 
 		# This can be useful for debugging.
-		logRendererGLEventToFile = "INFO"
+		logRendererGLEventToFile = "ERROR"
 		#
 		# If enabled, the mod will log information about network operations. 
 		# This can be useful for debugging.
-		logNetworkEventToFile = "INFO"
+		logNetworkEventToFile = "ERROR"
 		#
 		# If enabled, config changes sent by the server will be logged.
-		logConnectionConfigChangesToFile = "WARN"
+		logConnectionConfigChangesToFile = "ERROR"
 		#
 		# 
-		globalFileMaxLevel = "INFO"
+		globalFileMaxLevel = "ERROR"
 
 		[common.logging.warning]
 			#
@@ -209,7 +209,7 @@ _version = 4
 			#
 			# If enabled, a chat message will be displayed if vanilla MC's 
 			# render distance is higher than the recommended amount.
-			showHighVanillaRenderDistanceWarning = true
+			showHighVanillaRenderDistanceWarning = false
 			#
 			# If enabled, a chat message will be displayed if DH detects 
 			# that any pooled objects have been garbage collected.
@@ -662,7 +662,7 @@ _version = 4
 				# Note: Due to current limitations, the min value is [50] 
 				# and the max value is 5000. Any values outside this range 
 				# will be set to 0 (disabled).
-				earthCurveRatio = 200
+				earthCurveRatio = 100
 
 			[client.advanced.graphics.genericRendering]
 				#
@@ -771,7 +771,7 @@ _version = 4
 				# Note: this is a best effort number. 
 				# The actual render distance may be above or below this number 
 				# depending on your other graphic settings.
-				lodChunkRenderDistanceRadius = 96
+				lodChunkRenderDistanceRadius = 64
 				#
 				# How should the sides and bottom of grass block LODs render? 
 				# 
@@ -790,7 +790,7 @@ _version = 4
 				# 
 				# COMPLETE: LODs will render transparent. 
 				# DISABLED: LODs will be opaque.
-				transparency = "DISABLED"
+				transparency = "COMPLETE"
 				#
 				# This is the same as vanilla Biome Blending settings for Lod area. 
 				#     Note: anything above '0' will slow down LOD loading time. 

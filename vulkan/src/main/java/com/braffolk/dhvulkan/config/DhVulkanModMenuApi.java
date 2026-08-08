@@ -61,6 +61,7 @@ public class DhVulkanModMenuApi implements ModMenuApi {
         fresnelCategory.addEntry(entryBuilder.startEnumSelector(Component.literal("Preset"), DhVulkanConfig.FresnelPreset.class, cfg.fresnelPreset)
                 .setDefaultValue(DhVulkanConfig.FresnelPreset.CHUNKS_12)
                 .setEnumNameProvider(preset -> Component.literal(((DhVulkanConfig.FresnelPreset) preset).getDisplayName()))
+                .setTooltip(Component.literal("Select a preset that matches your real chunk render distance (or the server's render distance, if using Bobby DH Compat on Auto). These presets provide optimal water reflection blending for their respective chunk distances up to 300 blocks high. Manually tweaking any value below will automatically switch this to Custom."))
                 .setSaveConsumer(newValue -> cfg.fresnelPreset = newValue)
                 .build());
         fresnelCategory.addEntry(entryBuilder.startFloatField(Component.literal("Base Y Level"), cfg.fresnelHeightBaseY)
