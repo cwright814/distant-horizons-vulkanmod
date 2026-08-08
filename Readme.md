@@ -7,6 +7,8 @@ LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling 
 - Atmospheric fog blends between real and lod chunks only at standard block heights (300 and below).
 - Cloud rendering will be disabled.
 - Attempts were made to improve inclement weather blending, but it still looks rather bad.
+- LOD chunks do not cast shadows.
+- And more...
 
 > **This is not a standalone mod.** You must have Distant Horizons, VulkanMod, AND Beryl installed. Get the latest versions as of Aug 6th, 2026. Tested for Minecraft version 26.1.2 with the default texture pack. I recommend installing "Not Enough Vulkan" and "Bobby" to avoid broken atmospheric fog and improve server chunk render distances. Please use **my v26.1 alterations** of those mods, which can be found on my [GitHub](https://github.com/cwright814?tab=repositories). Note that they manage the atmospheric fog setting automatically based on DH settings, so you do not need to manually disable it.
 
