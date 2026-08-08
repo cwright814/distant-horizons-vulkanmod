@@ -1,4 +1,4 @@
-# Distant Horizons — VulkanMod Extension
+# Distant Horizons — VulkanMod Extension (Minecraft v26.1.x)
 
 A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons) via [VulkanMod](https://github.com/xCollateral/VulkanMod).
 
@@ -40,10 +40,11 @@ See [docs/vulkan_implementation_roadmap.md](docs/vulkan_implementation_roadmap.m
 
 ## Requirements
 
-- **Minecraft:** 1.20.6 or 26.1 / 26.1.1 / 26.1.2
+- **Minecraft:** 26.1 / 26.1.1 / 26.1.2
 - **Mod loader:** Fabric
-- **VulkanMod** must be installed (0.4.2 for MC 1.20.6, 0.6.6+ for MC 26.1.x)
-- **Distant Horizons** 2.4.0+ (1.20.6) or 3.0.0+ (26.1.x) must be installed
+- **VulkanMod:** 0.6.8+
+- **Beryl:** 0.2.1+
+- **Distant Horizons:** 3.0.0+
 
 > This is not the official Distant Horizons mod. For the original, see the [GitLab](https://gitlab.com/distant-horizons-team/distant-horizons) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/distant-horizons) pages.
 
@@ -52,9 +53,6 @@ See [docs/vulkan_implementation_roadmap.md](docs/vulkan_implementation_roadmap.m
 ```bash
 # MC 26.1.2 (also supports 26.1 and 26.1.1 in the same jar)
 ./gradlew :vulkan:build -PmcVer="26.1.2"
-
-# MC 1.20.6
-./gradlew :vulkan:build -PmcVer="1.20.6"
 ```
 
 Place matching **Distant Horizons** and **VulkanMod** jars in `jars/` before building (see Modrinth: DH 3.0.3-b for 26.1.2, VulkanMod 0.6.6 for 26.1.2).
@@ -65,7 +63,7 @@ The compiled jar will be in `vulkan/build/libs/`.
 
 ### Prerequisites
 
-* JDK 21+ for MC 1.20.6 builds; **JDK 25+** for MC 26.1.x (Gradle auto-downloads via toolchains)
+* **JDK 25+** for MC 26.1.x (Gradle auto-downloads via toolchains)
 * Git — https://git-scm.com/
 
 ### IntelliJ IDEA
