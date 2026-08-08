@@ -1,6 +1,6 @@
 # Distant Horizons — VulkanMod + Beryl (Minecraft v26.1.x)
 
-A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons) via [VulkanMod](https://github.com/xCollateral/VulkanMod), with Beryl compatibility.
+A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons) via [VulkanMod](https://github.com/xCollateral/VulkanMod) with Beryl support.
 
 LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling Distant Horizons to work on systems and configurations running VulkanMod. **Beryl support is basic:**
 - Water has shader-based fresnel emulation with no sun support.
