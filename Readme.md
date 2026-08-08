@@ -13,7 +13,7 @@ LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling 
 > **Recommended Config:** I have included my recommended configuration for Distant Horizons in the `recommended_configs` folder. For the best visual experience when using this mod, copy `recommended_configs/DistantHorizons.toml` to your `.minecraft/config` folder. I highly recommend a real chunk render distance of 12 in VulkanMod Graphics settings. If your machine is quite powerful, a render distance of 20 is a great quality middle-ground. Setting the render distance to 32 looks fantastic, but you will likely increase lag spikes and the risk of an out-of-memory crash.
 
 ![Distant Horizons running on VulkanMod](docs/dh-vulkanmod.png)
-*Distant Horizons LODs rendered via VulkanMod's Vulkan backend. FPS capped at 82 as I was using LSFG-VK to double it to ~165.*
+*Distant Horizons LODs rendered via VulkanMod's Vulkan backend. FPS capped at 82 as I was using [LSFG-VK](https://github.com/PancakeTAS/lsfg-vk) to double it to ~165.*
 
 ## Status
 
