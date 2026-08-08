@@ -1,6 +1,6 @@
 # Distant Horizons → VulkanMod: Implementation Roadmap
 
-Status as of 2026-03-15: **Phases 1-7, extension mod port, multi-version support, MC depth comparison, cloud rendering, and DH 3.0 compatibility complete.** LODs render with correct colors, depth, lightmap, transparency, compositing, SSAO, fog, noise, earth curvature, overdraw prevention, cloud depth, weather ordering, and MC depth occlusion via an extension mod (mixin-based, no DH source modifications). Supports MC 1.20.6 (VulkanMod 0.4.2) and MC 1.21.11 (VulkanMod 0.6.1) from a single codebase. Compatible with both DH 2.4.x and 3.0.x.
+Status as of 2026-03-15: **Phases 1-7, extension mod port, multi-version support, MC depth comparison, cloud rendering, and DH 3.0 compatibility complete.** LODs render with correct colors, depth, lightmap, transparency, compositing, SSAO, fog, noise, earth curvature, overdraw prevention, ~~cloud depth~~, weather ordering, and MC depth occlusion via an extension mod (mixin-based, no DH source modifications). Supports MC 1.20.6 (VulkanMod 0.4.2) and MC 1.21.11 (VulkanMod 0.6.1) from a single codebase. Compatible with both DH 2.4.x and 3.0.x.
 
 ## Architecture Overview
 
@@ -106,7 +106,7 @@ Vulkan shaders under `vulkan/src/main/resources/shaders/vulkan/`:
 - [x] **Fog** — Vulkan-native 2-pass post-process via `DhFogPipeline.java`, see details below
 - [x] **Earth curvature** — vertex shader curves terrain based on `uEarthRadius`
 - [ ] **Wireframe debug** — needs `VK_POLYGON_MODE_LINE` pipeline variant
-- [x] **Cloud rendering** — custom Vulkan cloud renderer with VBO mesh geometry, correct depth compositing against LOD terrain. Supports fast/fancy modes. VM 0.6+ only.
+- [ ] ~~**Cloud rendering** — custom Vulkan cloud renderer with VBO mesh geometry, correct depth compositing against LOD terrain. Supports fast/fancy modes. VM 0.6+ only.~~
 
 ### SSAO Implementation Details
 
