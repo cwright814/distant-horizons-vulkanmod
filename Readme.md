@@ -1,4 +1,4 @@
-# Distant Horizons — VulkanMod Extension (Minecraft v26.1.x)
+# Distant Horizons — VulkanMod + Beryl (Minecraft v26.1.x)
 
 A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons) via [VulkanMod](https://github.com/xCollateral/VulkanMod).
 
