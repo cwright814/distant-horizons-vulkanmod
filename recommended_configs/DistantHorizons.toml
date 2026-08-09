@@ -741,7 +741,7 @@ _version = 4
 				# but will increase memory and GPU usage while zoomed in. 
 				#  
 				# A vanilla spyglass needs 4 detail levels to reach its full quality.
-				maxZoomQualityIncrease = 4
+				maxZoomQualityIncrease = 1
 				#
 				# How should LODs be shaded? 
 				# 
