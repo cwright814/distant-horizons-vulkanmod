@@ -234,6 +234,10 @@ public class VulkanRenderEngine implements VulkanBackend {
         this.drawCount = 0;
         this.frameReady = false;
 
+        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused) {
+            return;
+        }
+
         if (this.initFailed)
             return;
 

@@ -60,4 +60,16 @@ public class MixinLevelRenderer {
         Compat.runLateCompositeHook();
     }
 
+    @Inject(method = "renderLevel", at = @At("HEAD"))
+    private void dhvulkan$updateWeather(CallbackInfo ci) {
+        if (!Compat.isVulkanModActive()) return;
+        try {
+            net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+            boolean isRaining = level != null && level.isRaining();
+            com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused = isRaining;
+        } catch (Throwable t) {
+            // Safe fallback
+        }
+    }
+
 }

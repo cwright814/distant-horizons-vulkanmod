@@ -62,6 +62,8 @@ public class MixinFogRenderer {
         FogData fogData = net.vulkanmod.vulkan.VRenderSystem.getFogData();
         if (fogData == null) return;
 
+        if (clientLevel != null && clientLevel.isRaining()) return;
+
         try {
             // Get DH's LOD draw distance in blocks
             int dhLodDist = getDhLodDrawDistance();

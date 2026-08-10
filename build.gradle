@@ -11,6 +11,7 @@ plugins {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { name "Fabric"; url "https://maven.fabricmc.net/" }
         maven { name "ParchmentMC"; url "https://maven.parchmentmc.org" }

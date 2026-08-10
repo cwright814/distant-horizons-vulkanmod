@@ -59,6 +59,7 @@ public class VkRenderApiDefinition extends AbstractDhRenderApiDefinition {
     @Override public boolean isNativeRenderer() { return true; }
     @Override public com.seibel.distanthorizons.core.render.EDhRenderDepth getRenderDepth() { return com.seibel.distanthorizons.core.render.EDhRenderDepth.FORWARD_Z; }
     @Override public com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi getRenderApi() { return com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi.VULKAN; }
+    @Override public com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine getRenderingEngine() { return com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine.AUTO; }
 
     @Override
     public boolean useSingleIbo() {
