@@ -342,8 +342,8 @@ public class DhFogPipeline {
         setUniformFloat(this.pass1Uniforms, "uFogVerticalScale", 1.0f / MC.getWrappedClientLevel().getMaxHeight());
         setUniformInt(this.pass1Uniforms, "uFogDebugMode", 0);
         // Far fog config from DH in-game settings
-        float farFogStart = DhConfigHelper.farFogStart();
-        float farFogEnd = DhConfigHelper.farFogEnd();
+        float farFogStart = DhConfigHelper.farFogStart() * com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount;
+        float farFogEnd = DhConfigHelper.farFogEnd() * com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount;
         float farFogMin = DhConfigHelper.farFogMin();
         float farFogMax = DhConfigHelper.farFogMax();
         float farFogDensity = DhConfigHelper.farFogDensity();

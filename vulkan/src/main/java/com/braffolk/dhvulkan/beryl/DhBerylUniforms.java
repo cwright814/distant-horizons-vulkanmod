@@ -143,18 +143,30 @@ public final class DhBerylUniforms {
             float[] invMv = invertMatrix(mv);
             copyToBuffer("dhModelViewInverse", invMv);
 
-            // Read DH LOD render distance in blocks
-            int dhLodChunks = com.braffolk.dhvulkan.core.DhConfigHelper.lodChunkRenderDistanceRadius();
-            int dhLodBlocks = dhLodChunks > 0 ? dhLodChunks * 16 : Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4;
-
             // Target exponential fog factor: 95% fog density (x=3.0) at the edge of DH LOD draw distance
-            final float targetFogFactor = 3.0f / (float) dhLodBlocks;
+            // Use dynamic lambdas so the shader gets updated values every frame even if it caches the supplier!
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogFactor", () -> {
+                if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount <= 0.5f) {
+                    net.minecraft.client.renderer.fog.FogData fd = net.vulkanmod.vulkan.VRenderSystem.getFogData();
+                    return fd != null ? 3.0f / fd.renderDistanceEnd : 3.0f / (Minecraft.getInstance().options.getEffectiveRenderDistance() * 16);
+                }
+                int lodChunks = com.braffolk.dhvulkan.core.DhConfigHelper.lodChunkRenderDistanceRadius();
+                int lodBlocks = lodChunks > 0 ? lodChunks * 16 : Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4;
+                return 3.0f / (float) lodBlocks;
+            });
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnd", () -> {
+                if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount <= 0.5f) {
+                    net.minecraft.client.renderer.fog.FogData fd = net.vulkanmod.vulkan.VRenderSystem.getFogData();
+                    return fd != null ? fd.renderDistanceEnd : (float) (Minecraft.getInstance().options.getEffectiveRenderDistance() * 16);
+                }
+                int lodChunks = com.braffolk.dhvulkan.core.DhConfigHelper.lodChunkRenderDistanceRadius();
+                return (float) (lodChunks > 0 ? lodChunks * 16 : Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4);
+            });
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogRenderDistanceEnd", net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.get("FogEnd"));
+            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnvironmentalEnd", net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.get("FogEnd"));
 
-            // Override VulkanMod & Beryl's global FogFactor and FogEnd uniform suppliers directly
-            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogFactor", () -> targetFogFactor);
-            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnd", () -> (float) dhLodBlocks);
-            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogRenderDistanceEnd", () -> (float) dhLodBlocks);
-            net.vulkanmod.vulkan.shader.Uniforms.vec1f_uniformMap.put("FogEnvironmentalEnd", () -> (float) dhLodBlocks);
+            int lodChunksForBuf = com.braffolk.dhvulkan.core.DhConfigHelper.lodChunkRenderDistanceRadius();
+            int dhLodBlocks = lodChunksForBuf > 0 ? lodChunksForBuf * 16 : Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4;
 
             // Scalar uniforms
             MappedBuffer rdBuf = uniformBuffers.get("dhRenderDistance");

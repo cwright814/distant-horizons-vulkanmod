@@ -234,7 +234,7 @@ public class VulkanRenderEngine implements VulkanBackend {
         this.drawCount = 0;
         this.frameReady = false;
 
-        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused) {
+        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused && com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount <= 0.0f) {
             return;
         }
 
@@ -428,6 +428,8 @@ public class VulkanRenderEngine implements VulkanBackend {
         this.renderContext.setUniformFloat("uSunset3", cfg.sunsetCurve[2]);
         this.renderContext.setUniformFloat("uSunset4", cfg.sunsetCurve[3]);
         this.renderContext.setUniformFloat("uSunset5", cfg.sunsetCurve[4]);
+        
+        this.renderContext.setUniformFloat("uWeatherOpacity", com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount);
 
         this.renderContext.setUniformVec3f("uModelOffset", VEC3F_ZERO);
 

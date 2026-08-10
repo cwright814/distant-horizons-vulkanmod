@@ -62,7 +62,7 @@ public class MixinFogRenderer {
         FogData fogData = net.vulkanmod.vulkan.VRenderSystem.getFogData();
         if (fogData == null) return;
 
-        if (clientLevel != null && clientLevel.isRaining()) return;
+        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount <= 0.5f) return;
 
         try {
             // Get DH's LOD draw distance in blocks

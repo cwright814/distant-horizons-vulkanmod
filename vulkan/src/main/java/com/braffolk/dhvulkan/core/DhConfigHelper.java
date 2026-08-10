@@ -104,7 +104,7 @@ public final class DhConfigHelper {
     }
 
     public static int lodChunkRenderDistanceRadius() {
-        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused) {
+        if (com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherPaused && com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount <= 0.0f) {
             return 0;
         }
         return toInt(Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius.get());
