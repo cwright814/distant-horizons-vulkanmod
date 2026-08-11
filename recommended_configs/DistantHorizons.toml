@@ -132,7 +132,7 @@ _version = 4
 		# 
 		# You probably don't need to change this unless you are also 
 		# running C2ME and are seeing thread starvation in either C2ME or DH.
-		threadPriority = 5
+		threadPriority = 3
 
 	[common.logging]
 		#
