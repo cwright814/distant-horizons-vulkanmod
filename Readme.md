@@ -5,10 +5,13 @@ A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizon
 LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling Distant Horizons to work on systems and configurations running VulkanMod. **Beryl support is basic:**
 - Water has shader-based fresnel emulation with no sun support.
 - Atmospheric fog blends between real and lod chunks only at standard block heights (300 and below).
-- Cloud rendering will be disabled.
+- Cloud rendering will be disabled.*
 - Attempts were made to improve inclement weather blending, but it still looks rather bad.
 - LOD chunks do not cast shadows.
 - And more...
+
+> [!NOTE]
+> *For cloud rendering, see [my vulkanmod port of Better Clouds](https://github.com/cwright814/better-clouds-vulkanmod).
 
 > **This is not a standalone mod.** You must have Distant Horizons, VulkanMod, AND Beryl installed. Get the latest versions as of Aug 6th, 2026. Tested for Minecraft version 26.1.2 with the default texture pack. I also recommend installing **Not Enough Vulkan** and **Bobby** (optional) to avoid broken atmospheric fog and improve server chunk render distances. You should use my v26.1 alterations of those mods, found on my [GitHub](https://github.com/cwright814?tab=repositories), as they will automatically adjust for optimal visuals based on your configuration and mod combination. While I did my best to avoid any of your mod settings getting directly altered, you should still back up your `.minecraft/config` folder. Back up your world too, while you're at it.
 
@@ -30,7 +33,6 @@ LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling 
 - Fade / clip distance transitions
 - Earth curvature rendering
 - ~~Cloud rendering with correct depth against LOD terrain (VM 0.6+)~~
-  - For cloud rendering, see [my vulkanmod port of Better Clouds](https://github.com/cwright814/better-clouds-vulkanmod)
 - Weather effects (rain, snow) render correctly in front of LODs
 
 ### ⚠️ Not Yet Implemented
