@@ -18,6 +18,7 @@ layout(location = 1) in vec4 color;
 layout(location = 0) out vec4 vertexColor;
 layout(location = 1) out vec3 vertexWorldPos;
 layout(location = 2) out vec4 vPos;
+layout(location = 3) out vec4 rawColor;
 
 // Uniforms — shared with fragment shader
 layout(set = 0, binding = 0) uniform DhUniforms {
@@ -63,6 +64,7 @@ void main()
 {
     // Pass raw position to fragment shader (for noise quantization)
     vPos = vec4(vPosition);
+    rawColor = color;
 
     // Cast to unsigned for bitwise metadata extraction
     uvec4 uPos = uvec4(vPosition);

@@ -14,6 +14,7 @@
 layout(location = 0) in vec4 vertexColor;
 layout(location = 1) in vec3 vertexWorldPos;
 layout(location = 2) in vec4 vPos;
+layout(location = 3) in vec4 rawColor;
 
 // Output
 layout(location = 0) out vec4 fragColor;
@@ -133,7 +134,7 @@ void main()
     fragColor = vertexColor;
 
     // Water fragment detection (translucent or blue-dominant)
-    if (fragColor.a < 0.99 || (fragColor.b > fragColor.r + 0.05 && fragColor.b > fragColor.g))
+    if (rawColor.a < 0.99 || (rawColor.b > rawColor.r + 0.05 && rawColor.b > rawColor.g))
     {
         // 1. Water Desaturation controlled dynamically by DH Saturation slider
         float gray = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
