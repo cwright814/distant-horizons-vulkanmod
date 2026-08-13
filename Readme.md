@@ -1,6 +1,13 @@
 # Distant Horizons — VulkanMod + Beryl (Minecraft v26.1.x)
 
+![Distant Horizons running on VulkanMod](docs/dh-vulkanmod.png)
+*Distant Horizons LODs rendered via VulkanMod's Vulkan backend. FPS capped at 82 as I was using [LSFG-VK](https://github.com/PancakeTAS/lsfg-vk) to double it to ~165.*
+
 A Fabric extension mod that adds native **Vulkan rendering** to [Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons) via [VulkanMod](https://github.com/xCollateral/VulkanMod) with Beryl support.
+
+> **This is not a standalone mod.** You must have Distant Horizons, VulkanMod, AND Beryl installed. Get the latest versions as of Aug 6th, 2026. Tested for Minecraft version 26.1.2 with the default texture pack. I also recommend installing **Not Enough Vulkan** and **Bobby** (optional) to avoid broken atmospheric fog and improve server chunk render distances. You should use my v26.1 alterations of those mods, found on my [GitHub](https://github.com/cwright814?tab=repositories), as they will automatically adjust for optimal visuals based on your configuration and mod combination. While I did my best to avoid any of your mod settings getting directly altered, you should still back up your `.minecraft/config` folder. Back up your world too, while you're at it.
+
+> **Recommended Config:** I have included my recommended configuration for Distant Horizons in the `recommended_configs` folder. For the best visual experience when using this mod, copy `recommended_configs/DistantHorizons.toml` to your `.minecraft/config` folder. I highly recommend a real chunk render distance of 12 in VulkanMod Graphics settings. If your machine is quite powerful, a render distance of 20 is a great quality middle-ground. Setting the render distance to 32 looks fantastic, but you will likely increase lag spikes and the risk of an out-of-memory crash.
 
 LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling Distant Horizons to work on systems and configurations running VulkanMod. **Beryl support is basic:**
 - Water has shader-based fresnel emulation with no sun support.
@@ -12,13 +19,6 @@ LODs are rendered using VulkanMod's Vulkan pipeline instead of OpenGL, enabling 
 
 > [!NOTE]
 > *For cloud rendering, see [my vulkanmod port of Better Clouds](https://github.com/cwright814/better-clouds-vulkanmod).
-
-> **This is not a standalone mod.** You must have Distant Horizons, VulkanMod, AND Beryl installed. Get the latest versions as of Aug 6th, 2026. Tested for Minecraft version 26.1.2 with the default texture pack. I also recommend installing **Not Enough Vulkan** and **Bobby** (optional) to avoid broken atmospheric fog and improve server chunk render distances. You should use my v26.1 alterations of those mods, found on my [GitHub](https://github.com/cwright814?tab=repositories), as they will automatically adjust for optimal visuals based on your configuration and mod combination. While I did my best to avoid any of your mod settings getting directly altered, you should still back up your `.minecraft/config` folder. Back up your world too, while you're at it.
-
-> **Recommended Config:** I have included my recommended configuration for Distant Horizons in the `recommended_configs` folder. For the best visual experience when using this mod, copy `recommended_configs/DistantHorizons.toml` to your `.minecraft/config` folder. I highly recommend a real chunk render distance of 12 in VulkanMod Graphics settings. If your machine is quite powerful, a render distance of 20 is a great quality middle-ground. Setting the render distance to 32 looks fantastic, but you will likely increase lag spikes and the risk of an out-of-memory crash.
-
-![Distant Horizons running on VulkanMod](docs/dh-vulkanmod.png)
-*Distant Horizons LODs rendered via VulkanMod's Vulkan backend. FPS capped at 82 as I was using [LSFG-VK](https://github.com/PancakeTAS/lsfg-vk) to double it to ~165.*
 
 ## Status
 
