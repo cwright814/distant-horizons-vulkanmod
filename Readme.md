@@ -1,4 +1,4 @@
-# Distant Horizons — VulkanMod + Beryl (Minecraft v26.1.x)
+# Distant Horizons for VulkanMod + Beryl (Minecraft v26.1.x)
 
 ![Distant Horizons running on VulkanMod](docs/dh-vulkanmod.png)
 *Distant Horizons LODs rendered via VulkanMod's Vulkan backend. FPS capped at 82 as I was using [LSFG-VK](https://github.com/PancakeTAS/lsfg-vk) to double it to ~165.*
