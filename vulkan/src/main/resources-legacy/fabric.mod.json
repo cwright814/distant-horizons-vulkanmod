@@ -2,7 +2,7 @@
     "schemaVersion": 1,
     "id": "dh-vulkanmod",
     "version": "${version}",
-    "name": "Distant Horizons — VulkanMod Extension",
+    "name": "Distant Horizons - VulkanMod Extension",
     "description": "Adds native Vulkan rendering to Distant Horizons via VulkanMod. Replaces DH's OpenGL pipeline with a Vulkan backend for SSAO, fog, depth compositing, and LOD rendering.",
     "authors": [
         "Braffolk"

@@ -237,7 +237,7 @@ public class VulkanCloudRenderer {
                     org.lwjgl.opengl.GL11.GL_ONE,
                     org.lwjgl.opengl.GL11.GL_ZERO);
             VRenderSystem.enableDepthTest();
-            VRenderSystem.depthFunc(org.lwjgl.opengl.GL11.GL_LEQUAL);
+            VRenderSystem.depthFunc(org.lwjgl.opengl.GL11.GL_GEQUAL);
             // Clouds depth-TEST (hide behind terrain/LODs) but do NOT depth-WRITE.
             // This prevents cloud depth from blocking weather/particles rendered later.
             VRenderSystem.depthMask = true;

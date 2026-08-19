@@ -41,12 +41,24 @@ vec3 reconstructViewPos(vec2 uv, float depth) {
  * to MC's depth buffer, we unproject DH depth → view space → reproject
  * with MC's projection.
  */
-float remapDepthDhToMc(vec2 uv, float dhDepth) {
-    // Vulkan NDC: X,Y in [-1, 1], Z in [0, 1]
-    // Single mat4 multiply: uRemapProj = uMcProj * uInvProj (pre-multiplied on CPU)
-    vec4 mcClip = uRemapProj * vec4(uv * 2.0 - 1.0, dhDepth, 1.0);
-    // Vulkan clip space Z/W is already in [0, 1], so we return it directly
-    return mcClip.z / mcClip.w;
+float remapDepthDhToMc(vec2 uv, float dhDepth, float viewSpaceBias) {
+    if (viewSpaceBias == 0.0) {
+        // Fast path: use fused matrix
+        vec4 mcClip = uRemapProj * vec4(uv * 2.0 - 1.0, dhDepth, 1.0);
+        return mcClip.z / mcClip.w;
+    } else {
+        // Unproject to view space
+        vec4 viewPos = uInvProj * vec4(uv * 2.0 - 1.0, dhDepth, 1.0);
+        viewPos /= viewPos.w;
+        
+        // Push away from camera (Vulkan view space Z points inward or outward? 
+        // In MC, camera looks down -Z. Subtracting bias pushes it further away).
+        viewPos.z -= viewSpaceBias;
+        
+        // Reproject with MC's projection
+        vec4 mcClip = uMcProj * viewPos;
+        return mcClip.z / mcClip.w;
+    }
 }
 
 /**
@@ -147,22 +159,15 @@ void main() {
         // Write MC-compatible LOD depth for ALL DH pixels in Phase 2.
         // If mcDepth < 1.0, this handles the fade transition.
         // If mcDepth >= 1.0, this updates the MC depth buffer so clouds can depth-test!
-        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth);
+        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, 0.0);
         gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
     } else {
         // Phase 1 (without MC depth):
-        if (uIsNoneMode != 0) {
-            // In NONE mode, MC terrain doesn't overlap LODs. 
-            // Write the true LOD depth so Phase 1 accurately occludes clouds!
-            // Small bias pushes LODs slightly behind MC terrain to prevent z-fighting
-            // at the overlap boundary (MC terrain wins at equal depth).
-            float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth);
-            gl_FragDepth = clamp(mcCompatibleDepth + 0.0001, 0.0, 1.0);
-        } else {
-            // For SINGLE/DOUBLE, we must write far-plane depth so MC terrain AND
-            // weather both render freely on top via LEQUAL (prevents intense Z-fighting 
-            // during MC solid/translucent passes). LOD colors are strictly blended.
-            gl_FragDepth = 1.0;
-        }
+        // Write the true LOD depth so Phase 1 accurately occludes clouds!
+        // To prevent Z-fighting with perfectly overlapping MC terrain (especially at grazing angles
+        // near ground level where LOD geometry might be slightly rounded/protruding), we push the LOD
+        // 2.5 blocks away from the camera in view space. This perfectly preserves precision!
+        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, 2.5);
+        gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
     }
 }

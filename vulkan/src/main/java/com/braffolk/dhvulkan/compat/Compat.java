@@ -346,12 +346,42 @@ public final class Compat {
      * On VM 0.4.2, it calls swapChain.beginRenderPass() directly without updating
      * Renderer state — we must fix up boundFramebuffer/boundRenderPass afterward.
      */
+    private static java.lang.reflect.Field rebindPassField;
+    private static java.lang.reflect.Field hdrFinalFramebufferField;
+    private static boolean reflectionInitialized = false;
+
     public static void rebindMainTarget() {
         net.vulkanmod.vulkan.pass.MainPass mainPass =
                 Renderer.getInstance().getMainPass();
         // Use interface method — works for both DefaultMainPass and
         // Beryl's ShaderMainPass (which also implements MainPass).
         mainPass.rebindMainTarget();
+        
+        net.vulkanmod.vulkan.Renderer renderer = net.vulkanmod.vulkan.Renderer.getInstance();
+        if (renderer.getBoundRenderPass() == null) {
+            try {
+                if (!reflectionInitialized) {
+                    rebindPassField = mainPass.getClass().getField("rebindPass");
+                    hdrFinalFramebufferField = mainPass.getClass().getField("hdrFinalFramebuffer");
+                    reflectionInitialized = true;
+                }
+                
+                if (rebindPassField != null && hdrFinalFramebufferField != null) {
+                    net.vulkanmod.vulkan.framebuffer.RenderPass rebindPass = (net.vulkanmod.vulkan.framebuffer.RenderPass) rebindPassField.get(mainPass);
+                    net.vulkanmod.vulkan.framebuffer.Framebuffer fbo = (net.vulkanmod.vulkan.framebuffer.Framebuffer) hdrFinalFramebufferField.get(mainPass);
+                    
+                    if (rebindPass != null && fbo != null) {
+                        if (rebindPass.getFramebuffer() == null) {
+                            rebindPass.setFramebuffer(fbo);
+                        }
+                        renderer.setBoundFramebuffer(null);
+                        renderer.beginRenderPass(rebindPass, fbo);
+                    }
+                }
+            } catch (Exception e) {
+                reflectionInitialized = true;
+            }
+        }
 
         #if MC_VER < MC_1_21_1
         // VM 0.4.2: rebindMainTarget starts auxRenderPass on swapChain but doesn't
@@ -362,7 +392,7 @@ public final class Compat {
             Renderer.getInstance().setBoundFramebuffer(net.vulkanmod.vulkan.Vulkan.getSwapChain());
             Renderer.getInstance().setBoundRenderPass(auxPass);
         } catch (Exception e) {
-            throw new RuntimeException("[DH-Vulkan] Failed to rebind main target on VM 0.4.2", e);
+            DhApi.LOGGER.error("Failed to fix VM 0.4.2 Renderer state", e);
         }
         #endif
     }

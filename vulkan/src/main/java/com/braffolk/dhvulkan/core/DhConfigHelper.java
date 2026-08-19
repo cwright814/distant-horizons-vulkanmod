@@ -220,7 +220,7 @@ public final class DhConfigHelper {
             speedAverage = speedAverage * (1.0 - SPEED_SMOOTH_FACTOR) + currentSpeed * SPEED_SMOOTH_FACTOR;
 
             if (speedAverage >= DYNAMIC_MIN_SPEED) {
-                float speedRange = (float) ((DYNAMIC_MAX_SPEED - speedAverage) / DYNAMIC_MAX_SPEED);
+                float speedRange = (float) ((DYNAMIC_MAX_SPEED - speedAverage) / (DYNAMIC_MAX_SPEED - DYNAMIC_MIN_SPEED));
                 speedRange = Math.max(speedRange, DYNAMIC_MIN_OVERDRAW_RATIO);
                 overdraw *= speedRange;
 
@@ -299,7 +299,7 @@ public final class DhConfigHelper {
         // NOTE: DH base applies Math.min(nearClipPlane, 7.5f) only for the PROJECTION
         // MATRIX near clip plane (in createLodProjectionMatrix), NOT for uClipDistance
         // or fade distances. We do NOT cap here — DH handles the projection cap internally.
-
+        
         return nearClipPlane;
     }
 
@@ -321,4 +321,3 @@ public final class DhConfigHelper {
         return clipDist;
     }
 }
-
