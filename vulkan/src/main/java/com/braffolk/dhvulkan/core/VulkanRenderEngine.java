@@ -819,13 +819,18 @@ public class VulkanRenderEngine implements VulkanBackend {
             float fadeStartDist = dhNearClipDistance * 1.5f;
             float fadeEndDist = dhNearClipDistance * 1.9f;
 
+            float cameraY = 80.0f;
+            try {
+                cameraY = (float) com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector.INSTANCE.get(com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper.class).getCameraExactPosition().y;
+            } catch (Exception e) {}
+
             boolean isNoneMode = DhConfigHelper.vanillaFadeMode() == com.seibel.distanthorizons.api.enums.config.EDhApiMcRenderingFadeMode.NONE;
             this.compositePipeline.render(
                     this.dhFramebuffer.getFramebuffer().getColorAttachment(),
                     this.dhFramebuffer.getFramebuffer().getDepthAttachment(),
                     ssaoTex, fogTex,
                     mcDepthTexture,
-                    debugMode, isNoneMode, this.tempInvProjArray, this.tempMcProjArray,
+                    debugMode, isNoneMode, cameraY, this.tempInvProjArray, this.tempMcProjArray,
                     this.tempInvMcMvmProjArray, fadeStartDist, fadeEndDist);
         }
     }

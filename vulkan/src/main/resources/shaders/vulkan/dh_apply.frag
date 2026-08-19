@@ -12,6 +12,7 @@ layout(std140, binding = 0) uniform CompositeUBO {
     int uDebugMode;         // 0=off, 1=depth, 2=ssao, 3=fog_alpha, 4=fog_color, 5=normals, 6=mc_depth
     int uUseMcDepth;        // 0=no MC depth comparison, 1=use MC depth for fade
     int uIsNoneMode;        // 1=NONE mode (no overlap), 0=SINGLE/DOUBLE phase 1
+    float uCameraY;         // The player's absolute Y coordinate
     float uStartFadeBlockDist;  // distance where DH fade begins (blocks)
     float uEndFadeBlockDist;    // distance where DH fade ends (blocks)
     float uStartFadeBlockDistSq; // squared, for dot() instead of length()
@@ -167,7 +168,13 @@ void main() {
         // To prevent Z-fighting with perfectly overlapping MC terrain (especially at grazing angles
         // near ground level where LOD geometry might be slightly rounded/protruding), we push the LOD
         // 2.5 blocks away from the camera in view space. This perfectly preserves precision!
-        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, 2.5);
+        // As the player gets higher (above Y=64), we scale this gap up further because
+        // looking straight down compresses depth buffer precision geometrically.
+        float totalBias = 32.0;
+        if (uCameraY > 64.0) {
+            totalBias += ((uCameraY - 64.0) / 32.0) * 8.0;
+        }
+        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, totalBias);
         gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
     }
 }
