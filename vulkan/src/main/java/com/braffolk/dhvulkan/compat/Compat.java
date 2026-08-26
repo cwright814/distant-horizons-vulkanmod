@@ -358,7 +358,7 @@ public final class Compat {
         mainPass.rebindMainTarget();
         
         net.vulkanmod.vulkan.Renderer renderer = net.vulkanmod.vulkan.Renderer.getInstance();
-        if (renderer.getBoundRenderPass() == null) {
+        if (renderer.getBoundRenderPass() == null || renderer.getBoundRenderPass().getFramebuffer() == null) {
             try {
                 if (!reflectionInitialized) {
                     rebindPassField = mainPass.getClass().getField("rebindPass");
