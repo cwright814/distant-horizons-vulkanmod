@@ -75,7 +75,8 @@ public class DhVulkanConfig {
         CHUNKS_12("12 Chunks"),
         CHUNKS_20("20 Chunks"),
         CHUNKS_32("32 Chunks"),
-        CUSTOM("Custom");
+        CUSTOM("Custom"),
+        CHUNKS_10("10 Chunks");
 
         private final String displayName;
         FresnelPreset(String displayName) {
@@ -101,6 +102,14 @@ public class DhVulkanConfig {
         // For now, all presets share the same default values.
         // We prep the structure so they can be changed easily later.
         switch (preset) {
+            case CHUNKS_10:
+                this.fresnelHeightBaseY = 70.0f;
+                this.fresnelHeightTargetY = 105.0f;
+                this.fresnelHeightBaseMult = 1.75f;
+                this.fresnelHeightTargetMult = 0.5f;
+                this.fresnelHeightMinMult = 0.0f;
+                this.fresnelHeightMaxMult = 3.0f;
+                break;
             case CHUNKS_20:
                 this.fresnelHeightBaseY = 80.0f;
                 this.fresnelHeightTargetY = 130.0f;
