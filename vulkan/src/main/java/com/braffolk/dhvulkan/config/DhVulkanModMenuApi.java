@@ -94,6 +94,11 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                 .setDefaultValue(false)
                 .setSaveConsumer(newValue -> cfg.forceVulkanRendering = newValue)
                 .build());
+        generalCategory.addEntry(entryBuilder.startBooleanToggle(Component.literal("Dither Jitter"), cfg.ditherJitter)
+                .setDefaultValue(false)
+                .setTooltip(Component.literal("Randomizes the offset of the Distant Horizons alpha dissolve dither to act as temporal anti-aliasing. WARNING: Will cause boiling/film-grain on chunks that are close to full opacity."))
+                .setSaveConsumer(newValue -> cfg.ditherJitter = newValue)
+                .build());
 
         // Sunrise (22000 to 24000)
         for (int i = 0; i < 5; i++) {

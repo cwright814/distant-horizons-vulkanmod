@@ -45,6 +45,11 @@ public class DhVulkanConfig {
     public boolean forceVulkanRendering = false;
 
     /**
+     * Toggles temporal jittering of the Interleaved Gradient Noise for DH fades.
+     */
+    public boolean ditherJitter = false;
+
+    /**
      * Sunrise transition curve (ticks 22000 to 24000)
      */
     public float[] sunriseCurve = new float[]{0.0f, 0.55f, 0.85f, 0.96f, 1.0f};
