@@ -99,6 +99,11 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                 .setTooltip(Component.literal("Randomizes the offset of the Distant Horizons alpha dissolve dither to act as temporal anti-aliasing. WARNING: Will cause boiling/film-grain on chunks that are close to full opacity."))
                 .setSaveConsumer(newValue -> cfg.ditherJitter = newValue)
                 .build());
+        generalCategory.addEntry(entryBuilder.startBooleanToggle(Component.literal("Triangular Dither Distribution"), cfg.ditherTriangle)
+                .setDefaultValue(true)
+                .setTooltip(Component.literal("Upgrades the chunk fade dither to use a triangular distribution instead of a uniform distribution. Reduces visual banding artifacts."))
+                .setSaveConsumer(newValue -> cfg.ditherTriangle = newValue)
+                .build());
 
         // Sunrise (22000 to 24000)
         for (int i = 0; i < 5; i++) {

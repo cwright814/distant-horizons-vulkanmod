@@ -216,6 +216,7 @@ public class VulkanRenderContext {
         
         addDhUniform(uboBuilder, "float", "uWeatherOpacity", 1, 4);
         addDhUniform(uboBuilder, "float", "uRenderTime", 1, 4);
+        addDhUniform(uboBuilder, "int", "uDitherTriangle", 1, 4);
 
         UBO mainUbo = uboBuilder.buildUBO(0, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
         // VM 0.4.2: uniforms' setSupplier() auto-lookup only finds MC's built-in

@@ -48,6 +48,12 @@ public class DhVulkanConfig {
      * Toggles temporal jittering of the Interleaved Gradient Noise for DH fades.
      */
     public boolean ditherJitter = false;
+    
+    /**
+     * Toggles Triangular Distribution for the Interleaved Gradient Noise for DH fades.
+     * Reduces banding artifacts compared to standard uniform noise.
+     */
+    public boolean ditherTriangle = true;
 
     /**
      * Sunrise transition curve (ticks 22000 to 24000)

@@ -432,6 +432,7 @@ public class VulkanRenderEngine implements VulkanBackend {
         this.renderContext.setUniformFloat("uWeatherOpacity", com.seibel.distanthorizons.core.api.internal.ClientApi.INSTANCE.weatherFadeAmount);
         float ditherTime = DhVulkanConfig.get().ditherJitter ? (System.currentTimeMillis() % 100000L) / 16.0f : 0.0f;
         this.renderContext.setUniformFloat("uRenderTime", ditherTime);
+        this.renderContext.setUniformBool("uDitherTriangle", DhVulkanConfig.get().ditherTriangle);
 
         this.renderContext.setUniformVec3f("uModelOffset", VEC3F_ZERO);
 

@@ -58,6 +58,7 @@ layout(set = 0, binding = 0) uniform DhUniforms {
     float uFresnelHeightMaxMult;
     float uWeatherOpacity;
     float uRenderTime;
+    int uDitherTriangle;
 };
 
 
@@ -105,12 +106,22 @@ void applyNoise(inout vec4 frag, const in float viewDist)
 //    Dither function    //
 // ==================== //
 
-float getDitherNoise(vec2 st)
-{
-    // Interleaved Gradient Noise (IGN) with Golden Ratio Temporal Jitter
+float ign(vec2 st) {
     vec2 jitterOffset = vec2(mod(uRenderTime * 0.61803398875, 1.0), mod(uRenderTime * 0.38196601125, 1.0)) * 1000.0;
     vec2 jitteredCoord = st + jitterOffset;
     return fract(52.9829189 * fract(dot(jitteredCoord, vec2(0.06711056, 0.00583715))));
+}
+
+float getDitherNoise(vec2 st)
+{
+    // Interleaved Gradient Noise (IGN) with Golden Ratio Temporal Jitter
+    float n = ign(st);
+    if (uDitherTriangle != 0) {
+        // Inverse transform sampling to convert uniform distribution to triangular distribution
+        float t = n < 0.5 ? sqrt(2.0 * n) - 1.0 : 1.0 - sqrt(2.0 - 2.0 * n);
+        return t * 0.5 + 0.5; // remap from [-1, 1] to [0, 1]
+    }
+    return n;
 }
 
 
