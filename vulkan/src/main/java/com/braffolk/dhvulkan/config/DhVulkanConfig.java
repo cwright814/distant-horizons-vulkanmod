@@ -104,11 +104,11 @@ public class DhVulkanConfig {
         switch (preset) {
             case CHUNKS_10:
                 this.fresnelHeightBaseY = 70.0f;
-                this.fresnelHeightTargetY = 105.0f;
+                this.fresnelHeightTargetY = 85.0f;
                 this.fresnelHeightBaseMult = 1.75f;
                 this.fresnelHeightTargetMult = 0.5f;
                 this.fresnelHeightMinMult = 0.0f;
-                this.fresnelHeightMaxMult = 3.0f;
+                this.fresnelHeightMaxMult = 4.0f;
                 break;
             case CHUNKS_20:
                 this.fresnelHeightBaseY = 80.0f;
