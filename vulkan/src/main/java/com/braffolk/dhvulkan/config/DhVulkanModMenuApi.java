@@ -100,9 +100,14 @@ public class DhVulkanModMenuApi implements ModMenuApi {
                 .setSaveConsumer(newValue -> cfg.ditherJitter = newValue)
                 .build());
         generalCategory.addEntry(entryBuilder.startBooleanToggle(Component.literal("Triangular Dither Distribution"), cfg.ditherTriangle)
-                .setDefaultValue(true)
+                .setDefaultValue(false)
                 .setTooltip(Component.literal("Upgrades the chunk fade dither to use a triangular distribution instead of a uniform distribution. Reduces visual banding artifacts."))
                 .setSaveConsumer(newValue -> cfg.ditherTriangle = newValue)
+                .build());
+        generalCategory.addEntry(entryBuilder.startFloatField(Component.literal("Chunk Blend Offset"), cfg.chunkBlendOffset)
+                .setDefaultValue(8.0f)
+                .setTooltip(Component.literal("Buffer offset for chunk blending."))
+                .setSaveConsumer(newValue -> cfg.chunkBlendOffset = newValue)
                 .build());
 
         // Sunrise (22000 to 24000)

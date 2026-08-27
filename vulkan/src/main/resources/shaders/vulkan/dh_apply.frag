@@ -17,6 +17,7 @@ layout(std140, binding = 0) uniform CompositeUBO {
     float uEndFadeBlockDist;    // distance where DH fade ends (blocks)
     float uStartFadeBlockDistSq; // squared, for dot() instead of length()
     float uEndFadeBlockDistSq;   // squared, for dot() instead of length()
+    float uChunkBlendOffset;     // chunk blend buffer offset (blocks)
 };
 
 layout(set = 0, binding = 1) uniform sampler2D gDhColorTexture;
@@ -154,7 +155,7 @@ void main() {
         fragColor = texture(gDhColorTexture, TexCoord);
     }
 
-    float totalBias = -8.0;
+    float totalBias = -uChunkBlendOffset;
     float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, totalBias);
     gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
 }

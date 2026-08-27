@@ -92,6 +92,7 @@ public class DhCompositePipeline {
     private MappedBuffer endFadeDistBuf;
     private MappedBuffer startFadeDistSqBuf;
     private MappedBuffer endFadeDistSqBuf;
+    private MappedBuffer chunkBlendOffsetBuf;
 
     /**
      * Simple vertex format for the fullscreen quad: just vec2 position.
@@ -201,6 +202,10 @@ public class DhCompositePipeline {
         this.endFadeDistSqBuf.putFloat(0, 0);
         Compat.addUniformWithBuffer(uboBuilder, "float", "uEndFadeBlockDistSq", 1, () -> this.endFadeDistSqBuf);
 
+        this.chunkBlendOffsetBuf = new MappedBuffer(4);
+        this.chunkBlendOffsetBuf.putFloat(0, 0);
+        Compat.addUniformWithBuffer(uboBuilder, "float", "uChunkBlendOffset", 1, () -> this.chunkBlendOffsetBuf);
+
         UBO mainUbo = uboBuilder.buildUBO(0, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
         Compat.setUniformSuppliers(mainUbo, java.util.Map.ofEntries(
                 java.util.Map.entry("uInvProj", this.invProjBuf),
@@ -214,6 +219,7 @@ public class DhCompositePipeline {
                 java.util.Map.entry("uEndFadeBlockDist", this.endFadeDistBuf),
                 java.util.Map.entry("uStartFadeBlockDistSq", this.startFadeDistSqBuf),
                 java.util.Map.entry("uEndFadeBlockDistSq", this.endFadeDistSqBuf),
+                java.util.Map.entry("uChunkBlendOffset", this.chunkBlendOffsetBuf),
                 java.util.Map.entry("uIsNoneMode", this.isNoneModeBuf)));
         ubos.add(mainUbo);
 
@@ -273,6 +279,7 @@ public class DhCompositePipeline {
         this.endFadeDistBuf.putFloat(0, endFadeDist);
         this.startFadeDistSqBuf.putFloat(0, startFadeDist * startFadeDist);
         this.endFadeDistSqBuf.putFloat(0, endFadeDist * endFadeDist);
+        this.chunkBlendOffsetBuf.putFloat(0, com.braffolk.dhvulkan.config.DhVulkanConfig.get().chunkBlendOffset);
 
         // Compute fused remap matrix: uRemapProj = mcProj * invProj
         // This saves one mat4×vec4 per pixel in the shader
