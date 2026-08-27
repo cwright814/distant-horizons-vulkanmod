@@ -208,31 +208,6 @@ public final class DhConfigHelper {
             org.apache.logging.log4j.LogManager.getLogger("DH-VulkanMod");
 
     public static float applyVelocityReduction(float overdraw) {
-        try {
-            var mc = net.minecraft.client.Minecraft.getInstance();
-            if (mc == null || mc.player == null) return overdraw;
-
-            // getDeltaMovement() returns blocks/tick — convert to blocks/sec (×20 tps)
-            var delta = mc.player.getDeltaMovement();
-            double currentSpeed = Math.sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z) * 20.0;
-
-            // Exponential moving average for smooth transitions
-            speedAverage = speedAverage * (1.0 - SPEED_SMOOTH_FACTOR) + currentSpeed * SPEED_SMOOTH_FACTOR;
-
-            if (speedAverage >= DYNAMIC_MIN_SPEED) {
-                float speedRange = (float) ((DYNAMIC_MAX_SPEED - speedAverage) / (DYNAMIC_MAX_SPEED - DYNAMIC_MIN_SPEED));
-                speedRange = Math.max(speedRange, DYNAMIC_MIN_OVERDRAW_RATIO);
-                overdraw *= speedRange;
-
-                if (!velocityDiagLogged) {
-                    velocityDiagLogged = true;
-                    LOGGER.debug("[DH-VulkanMod] Velocity overdraw active: speed={}, overdraw={}",
-                            String.format("%.1f", speedAverage), String.format("%.3f", overdraw));
-                }
-            }
-        } catch (Exception e) {
-            // Safely ignore — player not available yet
-        }
         return overdraw;
     }
 

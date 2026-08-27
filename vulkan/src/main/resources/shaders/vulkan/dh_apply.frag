@@ -154,27 +154,7 @@ void main() {
         fragColor = texture(gDhColorTexture, TexCoord);
     }
 
-    if (uUseMcDepth != 0) {
-        float mcDepth = texture(gMcDepthTexture, TexCoord).r;
-        
-        // Write MC-compatible LOD depth for ALL DH pixels in Phase 2.
-        // If mcDepth < 1.0, this handles the fade transition.
-        // If mcDepth >= 1.0, this updates the MC depth buffer so clouds can depth-test!
-        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, 0.0);
-        gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
-    } else {
-        // Phase 1 (without MC depth):
-        // Write the true LOD depth so Phase 1 accurately occludes clouds!
-        // To prevent Z-fighting with perfectly overlapping MC terrain (especially at grazing angles
-        // near ground level where LOD geometry might be slightly rounded/protruding), we push the LOD
-        // 2.5 blocks away from the camera in view space. This perfectly preserves precision!
-        // As the player gets higher (above Y=64), we scale this gap up further because
-        // looking straight down compresses depth buffer precision geometrically.
-        float totalBias = 32.0;
-        if (uCameraY > 64.0) {
-            totalBias += ((uCameraY - 64.0) / 32.0) * 8.0;
-        }
-        float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, totalBias);
-        gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
-    }
+    float totalBias = -8.0;
+    float mcCompatibleDepth = remapDepthDhToMc(TexCoord, dhDepth, totalBias);
+    gl_FragDepth = clamp(mcCompatibleDepth, 0.0, 1.0);
 }
