@@ -53,13 +53,13 @@ public class DhVulkanConfig {
      * Toggles Triangular Distribution for the Interleaved Gradient Noise for DH fades.
      * Reduces banding artifacts compared to standard uniform noise.
      */
-    public boolean ditherTriangle = false;
+    public boolean ditherTriangle = true;
     
     /**
      * Buffer offset for chunk blending.
      * Expressed as a positive number but subtracted in the shader.
      */
-    public float chunkBlendOffset = 8.0f;
+    public float chunkBlendOffset = 1.0f;
 
     /**
      * Sunrise transition curve (ticks 22000 to 24000)
